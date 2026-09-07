@@ -9,10 +9,19 @@ import { Footer } from '@/components/layout/Footer';
 import { MobileNav } from '@/components/layout/MobileNav';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://connectacampus.netlify.app'),
   title: 'Campus Connect — Your Campus. Your Community. Your Events.',
   description:
     'The central digital campus community platform where students discover upcoming university events, clubs, workshops, hackathons, and opportunities.',
   keywords: 'campus events, college hackathons, university clubs, student networking, tech fest',
+  openGraph: {
+    title: 'Campus Connect — University Social & Event Discovery Platform',
+    description:
+      'Discover upcoming university events, join student communities, register with 1-click, and network with peers.',
+    url: 'https://connectacampus.netlify.app',
+    siteName: 'Campus Connect',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({

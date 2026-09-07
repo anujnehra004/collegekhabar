@@ -3,10 +3,14 @@
 > **"Your Campus. Your Community. Your Events."**
 > A modern, full-stack university digital campus hub where students discover upcoming events, join communities, register with 1 click, network with peers, and organize campus initiatives.
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-connectacampus.netlify.app-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://connectacampus.netlify.app)
+
 [![Next.js](https://img.shields.io/badge/Next.js-14.2-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38bdf8?style=flat&logo=tailwindcss)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e?style=flat&logo=supabase)](https://supabase.com/)
+
+🌐 **Live Deployed App**: **[https://connectacampus.netlify.app](https://connectacampus.netlify.app)**
 
 ---
 
