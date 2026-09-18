@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Profile | Campus Connect</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-logo">🎓</div>
+        <span>Campus<span class="text-primary">Connect</span></span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="events.html" class="nav-link">Events</a></li>
+          <li><a href="my-events.html" class="nav-link">My Events</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Dynamic via updateNavAuthUI -->
+      </div>
+
+      <button class="nav-toggle" aria-label="Toggle navigation menu">☰</button>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 50px; padding-bottom: 80px; max-width: 720px;">
+    <div class="section-header" style="margin-bottom: 30px;">
+      <div>
+        <span class="badge-tag">Account Settings</span>
+        <h1 class="section-title">Student Profile</h1>
+        <p class="section-subtitle">Manage your university identity and registration contact info.</p>
+      </div>
+    </div>
+
+    <div class="auth-card" style="max-width: 100%; padding: 36px;">
+      <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 30px; padding-bottom: 24px; border-bottom: 1px solid var(--border-subtle);">
+        <div id="profile-avatar-circle" class="user-avatar" style="width: 64px; height: 64px; font-size: 1.8rem;">
+          S
+        </div>
+        <div>
+          <h2 id="profile-heading-name" style="font-size: 1.5rem; margin-bottom: 4px;">Student User</h2>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span id="profile-email-badge" style="font-size: 0.9rem; color: var(--text-muted);">student@university.edu</span>
+            <span id="profile-role-badge" class="badge-tag" style="margin: 0; padding: 2px 10px; font-size: 0.72rem;">Student</span>
+          </div>
+        </div>
+      </div>
+
+      <form id="profile-form">
+        <div class="form-group">
+          <label class="form-label" for="profile-name">Full Name</label>
+          <input type="text" id="profile-name" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="profile-email">University Email (Read-Only)</label>
+          <input type="email" id="profile-email" class="form-input" disabled style="opacity: 0.7; cursor: not-allowed;">
+          <small style="color: var(--text-dim); display: block; margin-top: 6px;">
+            University email is linked to your institutional student identity.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Account Role</label>
+          <input type="text" id="profile-role" class="form-input" value="Student" disabled style="opacity: 0.7; cursor: not-allowed;">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 30px;">
+          <a href="my-events.html" class="btn btn-secondary">Back to My Events</a>
+          <button type="submit" id="btn-save-profile" class="btn btn-primary">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="border-top: none; padding-top: 0;">
+        <p>&copy; 2026 Campus Connect. All rights reserved. University Event Management System.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/student.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const isAuth = await authManager.requireStudentAuth();
+      if (!isAuth) return;
+
+      const profile = await authManager.getUserProfile();
+      const userData = await authManager.getCurrentUser();
+      const user = userData?.user;
+
+      if (profile && user) {
+        const name = profile.name || user.user_metadata?.name || '';
+        const email = profile.email || user.email || '';
+        const role = profile.role || user.user_metadata?.role || 'student';
+
+        document.getElementById('profile-name').value = name;
+        document.getElementById('profile-email').value = email;
+        document.getElementById('profile-role').value = role.charAt(0).toUpperCase() + role.slice(1);
+
+        document.getElementById('profile-heading-name').textContent = name || 'Student';
+        document.getElementById('profile-email-badge').textContent = email;
+        document.getElementById('profile-role-badge').textContent = role.toUpperCase();
+        document.getElementById('profile-avatar-circle').textContent = (name || 'S').charAt(0).toUpperCase();
+      }
+    });
+
+    document.getElementById('profile-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const newName = document.getElementById('profile-name').value.trim();
+      const saveBtn = document.getElementById('btn-save-profile');
+
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span class="spinner"></span> Saving changes...';
+
+      const success = await studentManager.updateProfileName(newName);
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save Changes';
+
+      if (success) {
+        document.getElementById('profile-heading-name').textContent = newName;
+        document.getElementById('profile-avatar-circle').textContent = newName.charAt(0).toUpperCase();
+        updateNavAuthUI();
+      }
+    });
+  </script>
+</body>
+</html>

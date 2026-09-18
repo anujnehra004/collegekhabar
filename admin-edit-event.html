@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Event | Campus Connect Admin</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-logo" style="background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);">🛡️</div>
+        <span>Campus<span class="text-secondary">Admin</span></span>
+      </a>
+
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <span id="admin-user-email" style="font-size: 0.85rem; color: var(--text-muted);">admin@campusconnect.edu</span>
+        <button class="btn btn-ghost btn-sm" onclick="authManager.logout()" style="color: #fda4af;">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+      <div class="dashboard-sidebar-header">
+        <span class="sidebar-title">Administration</span>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li>
+          <a href="admin-dashboard.html" class="sidebar-link">
+            <span class="sidebar-link-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="admin-events.html" class="sidebar-link active">
+            <span class="sidebar-link-icon">📅</span>
+            <span>Manage Events</span>
+          </a>
+        </li>
+        <li>
+          <a href="admin-add-event.html" class="sidebar-link">
+            <span class="sidebar-link-icon">➕</span>
+            <span>Add New Event</span>
+          </a>
+        </li>
+        <li>
+          <a href="admin-participants.html" class="sidebar-link">
+            <span class="sidebar-link-icon">👥</span>
+            <span>Participants</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <main class="dashboard-main" style="max-width: 900px;">
+      <div class="dashboard-header-bar">
+        <div>
+          <span class="badge-tag">Event Editor</span>
+          <h1 style="font-size: 2rem; margin-top: 4px;">Edit Event</h1>
+        </div>
+        <a href="admin-events.html" class="btn btn-secondary btn-sm">Cancel</a>
+      </div>
+
+      <div id="form-wrapper">
+        <div style="padding: 40px; text-align: center;">
+          <span class="spinner"></span>
+          <p class="text-muted" style="margin-top: 10px;">Loading event details from database...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/admin.js"></script>
+
+  <script>
+    let currentEventId = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const isAdmin = await authManager.requireAdminAuth();
+      if (!isAdmin) return;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      currentEventId = urlParams.get('id');
+
+      if (!currentEventId) {
+        showToast('No event ID provided.', 'error');
+        setTimeout(() => window.location.href = 'admin-events.html', 1000);
+        return;
+      }
+
+      await loadEventForEditing(currentEventId);
+    });
+
+    async function loadEventForEditing(id) {
+      const wrapper = document.getElementById('form-wrapper');
+      const event = await eventsManager.getEventById(id);
+
+      if (!event) {
+        wrapper.innerHTML = `
+          <div style="padding: 40px; text-align: center;">
+            <p class="text-rose">Event could not be found.</p>
+            <a href="admin-events.html" class="btn btn-primary" style="margin-top: 16px;">Back to Events</a>
+          </div>
+        `;
+        return;
+      }
+
+      wrapper.innerHTML = `
+        <div class="auth-card" style="max-width: 100%; padding: 36px;">
+          <form id="edit-event-form">
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+              <div class="form-group">
+                <label class="form-label" for="edit-title">Event Title *</label>
+                <input type="text" id="edit-title" class="form-input" value="${event.title}" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="edit-category">Category *</label>
+                <select id="edit-category" class="form-input" required>
+                  <option value="Technology" ${event.category === 'Technology' ? 'selected' : ''}>Technology</option>
+                  <option value="Hackathon" ${event.category === 'Hackathon' ? 'selected' : ''}>Hackathon</option>
+                  <option value="Workshop" ${event.category === 'Workshop' ? 'selected' : ''}>Workshop</option>
+                  <option value="Cultural" ${event.category === 'Cultural' ? 'selected' : ''}>Cultural</option>
+                  <option value="Sports" ${event.category === 'Sports' ? 'selected' : ''}>Sports</option>
+                  <option value="Seminar" ${event.category === 'Seminar' ? 'selected' : ''}>Seminar</option>
+                  <option value="Competition" ${event.category === 'Competition' ? 'selected' : ''}>Competition</option>
+                  <option value="Club Activity" ${event.category === 'Club Activity' ? 'selected' : ''}>Club Activity</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="edit-description">Event Description *</label>
+              <textarea id="edit-description" class="form-input form-textarea" rows="4" required>${event.description || ''}</textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              <div class="form-group">
+                <label class="form-label" for="edit-date">Event Date *</label>
+                <input type="date" id="edit-date" class="form-input" value="${event.date}" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="edit-time">Time Duration *</label>
+                <input type="text" id="edit-time" class="form-input" value="${event.time}" required>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              <div class="form-group">
+                <label class="form-label" for="edit-venue">Venue *</label>
+                <input type="text" id="edit-venue" class="form-input" value="${event.venue}" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="edit-organizer">Organizer / Student Club *</label>
+                <input type="text" id="edit-organizer" class="form-input" value="${event.organizer}" required>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              <div class="form-group">
+                <label class="form-label" for="edit-deadline">Registration Deadline *</label>
+                <input type="date" id="edit-deadline" class="form-input" value="${event.registration_deadline}" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="edit-max-participants">Maximum Participant Seats *</label>
+                <input type="number" id="edit-max-participants" class="form-input" min="1" max="5000" value="${event.max_participants || 100}" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="edit-image-url">Event Banner Image URL</label>
+              <input type="url" id="edit-image-url" class="form-input" value="${event.image_url || ''}">
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 14px; margin-top: 32px;">
+              <a href="admin-events.html" class="btn btn-secondary">Cancel</a>
+              <button type="submit" id="btn-save-edit" class="btn btn-purple btn-lg">
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      `;
+
+      document.getElementById('edit-event-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const btn = document.getElementById('btn-save-edit');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Saving changes...';
+
+        const updates = {
+          title: document.getElementById('edit-title').value.trim(),
+          category: document.getElementById('edit-category').value,
+          description: document.getElementById('edit-description').value.trim(),
+          date: document.getElementById('edit-date').value,
+          time: document.getElementById('edit-time').value.trim(),
+          venue: document.getElementById('edit-venue').value.trim(),
+          organizer: document.getElementById('edit-organizer').value.trim(),
+          registration_deadline: document.getElementById('edit-deadline').value,
+          max_participants: document.getElementById('edit-max-participants').value,
+          image_url: document.getElementById('edit-image-url').value.trim()
+        };
+
+        try {
+          await adminManager.updateEvent(currentEventId, updates);
+          showToast('Event updated successfully.', 'success');
+          setTimeout(() => {
+            window.location.href = 'admin-events.html';
+          }, 900);
+        } catch (err) {
+          showToast(err.message || 'Failed to update event.', 'error');
+          btn.disabled = false;
+          btn.innerHTML = 'Save Changes';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

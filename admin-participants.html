@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendee Roster | Campus Connect Admin</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-logo" style="background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);">🛡️</div>
+        <span>Campus<span class="text-secondary">Admin</span></span>
+      </a>
+
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <span id="admin-user-email" style="font-size: 0.85rem; color: var(--text-muted);">admin@campusconnect.edu</span>
+        <button class="btn btn-ghost btn-sm" onclick="authManager.logout()" style="color: #fda4af;">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+      <div class="dashboard-sidebar-header">
+        <span class="sidebar-title">Administration</span>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li>
+          <a href="admin-dashboard.html" class="sidebar-link">
+            <span class="sidebar-link-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="admin-events.html" class="sidebar-link">
+            <span class="sidebar-link-icon">📅</span>
+            <span>Manage Events</span>
+          </a>
+        </li>
+        <li>
+          <a href="admin-add-event.html" class="sidebar-link">
+            <span class="sidebar-link-icon">➕</span>
+            <span>Add New Event</span>
+          </a>
+        </li>
+        <li>
+          <a href="admin-participants.html" class="sidebar-link active">
+            <span class="sidebar-link-icon">👥</span>
+            <span>Participants</span>
+          </a>
+        </li>
+        <li>
+          <a href="events.html" target="_blank" class="sidebar-link">
+            <span class="sidebar-link-icon">🌐</span>
+            <span>Live Student View ↗</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <main class="dashboard-main">
+      <div class="dashboard-header-bar">
+        <div>
+          <span class="badge-tag">Registered Students</span>
+          <h1 style="font-size: 2rem; margin-top: 4px;">Attendee Roster</h1>
+        </div>
+
+        <button id="btn-export-csv" class="btn btn-secondary btn-sm" style="display: flex; align-items: center; gap: 8px;">
+          <span>📥</span> Export to CSV
+        </button>
+      </div>
+
+      <!-- Controls -->
+      <div class="search-filter-bar">
+        <div class="search-input-wrap">
+          <span class="search-input-icon">🔍</span>
+          <input type="text" id="participant-search-input" class="search-input" placeholder="Search by student name or university email...">
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <label for="event-filter-select" style="font-size: 0.85rem; color: var(--text-muted); white-space: nowrap;">Filter by Event:</label>
+          <select id="event-filter-select" class="filter-select">
+            <option value="all">All Events</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Participants Table -->
+      <div class="table-card">
+        <div style="padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between;">
+          <span id="participants-count-label" style="font-size: 0.9rem; font-weight: 600;">Loading participants...</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>University Email</th>
+                <th>Registered Event</th>
+                <th>Registration Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="participants-tbody">
+              <tr>
+                <td colspan="5" style="text-align: center; padding: 40px;">
+                  <span class="spinner"></span>
+                  <div class="text-muted" style="margin-top: 10px;">Loading registrations from Supabase...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/admin.js"></script>
+
+  <script>
+    let allParticipants = [];
+    let displayedParticipants = [];
+
+    const tbody = document.getElementById('participants-tbody');
+    const searchInput = document.getElementById('participant-search-input');
+    const eventFilterSelect = document.getElementById('event-filter-select');
+    const countLabel = document.getElementById('participants-count-label');
+    const exportBtn = document.getElementById('btn-export-csv');
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const isAdmin = await authManager.requireAdminAuth();
+      if (!isAdmin) return;
+
+      await populateEventDropdown();
+      await loadParticipants();
+    });
+
+    async function populateEventDropdown() {
+      try {
+        const events = await eventsManager.getAllEvents();
+        eventFilterSelect.innerHTML = '<option value="all">All Events</option>' + 
+          events.map(e => `<option value="${e.id}">${e.title}</option>`).join('');
+      } catch (e) {
+        console.error('Error populating event filter:', e);
+      }
+    }
+
+    async function loadParticipants() {
+      const selectedEventId = eventFilterSelect.value;
+      allParticipants = await adminManager.getAllParticipants(selectedEventId);
+      renderParticipants();
+    }
+
+    function renderParticipants() {
+      const q = searchInput.value.toLowerCase().trim();
+      displayedParticipants = allParticipants.filter(p => {
+        if (!q) return true;
+        return (
+          p.studentName.toLowerCase().includes(q) ||
+          p.studentEmail.toLowerCase().includes(q) ||
+          p.eventTitle.toLowerCase().includes(q)
+        );
+      });
+
+      countLabel.textContent = `Showing ${displayedParticipants.length} attendee${displayedParticipants.length === 1 ? '' : 's'}`;
+
+      if (displayedParticipants.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 50px;" class="text-muted">
+              No participants found matching the criteria.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = displayedParticipants.map(p => {
+        const isCancelled = p.status === 'cancelled';
+        return `
+          <tr>
+            <td>
+              <div style="font-weight: 700; color: #fff;">${p.studentName}</div>
+            </td>
+            <td>
+              <code style="color: var(--accent-cyan); font-size: 0.85rem;">${p.studentEmail}</code>
+            </td>
+            <td>
+              <div style="font-weight: 600;">${p.eventTitle}</div>
+            </td>
+            <td style="font-size: 0.85rem; color: var(--text-muted);">
+              ${eventsManager.formatDate(p.registeredAt)}
+            </td>
+            <td>
+              <span class="status-badge ${isCancelled ? 'status-cancelled' : 'status-registered'}">
+                ${isCancelled ? '✕ Cancelled' : '✓ Registered'}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    searchInput.addEventListener('input', renderParticipants);
+    eventFilterSelect.addEventListener('change', loadParticipants);
+
+    exportBtn.addEventListener('click', () => {
+      adminManager.exportParticipantsCSV(displayedParticipants);
+    });
+  </script>
+</body>
+</html>

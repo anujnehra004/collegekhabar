@@ -1,144 +1,192 @@
-# 🎓 Campus Connect — University Social & Event Discovery Platform
+# Campus Connect 🎓
+> A Modern University Event Discovery, Registration & Administrative Platform
 
-> **"Your Campus. Your Community. Your Events."**
-> A modern, full-stack university digital campus hub where students discover upcoming events, join communities, register with 1 click, network with peers, and organize campus initiatives.
+**This project uses Supabase for authentication and database management.**
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-connectacampus.netlify.app-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://connectacampus.netlify.app)
-
-[![Next.js](https://img.shields.io/badge/Next.js-14.2-black?style=flat&logo=next.js)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38bdf8?style=flat&logo=tailwindcss)](https://tailwindcss.com/)
-[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e?style=flat&logo=supabase)](https://supabase.com/)
-
-🌐 **Live Deployed App**: **[https://connectacampus.netlify.app](https://connectacampus.netlify.app)**
+Built with clean, modern HTML5, CSS3, and Vanilla JavaScript, **Campus Connect** replaces scattered Google Forms, buried email threads, and outdated campus boards with an interactive, responsive, and animated university portal. It is engineered specifically for university student clubs, campus administration, and BTech CSE capstone demonstrations.
 
 ---
 
-## ✨ Key Features
+## 🌟 Key Features
 
-- **🚀 High-Impact Landing Page**: Hero banner, live campus stats (16+ events, 2,400+ students, 28+ clubs, 3,200+ registrations), platform showcase mockup, and core pillars.
-- **👋 Personalized Student Dashboard**: Dynamic time-of-day greeting (*"Good evening, Anuj 👋"*), upcoming tickets, smart *"Recommended For You"* feed (matching department & interests), and trending campus events.
-- **🔍 Event Explorer**: Prominent search bar, category pills (Hackathon, Workshop, Seminar, Cultural, Sports, Technical, Placement, Fest, Social), format filters (In-Person / Online / Hybrid), pricing filters, and sorting.
-- **🎟️ Detailed Event Pages**: Large banner, capacity progress indicator with automatic *"Event Full"* state, 1-click registration with confetti celebrations, schedule agenda timeline, speakers, attendee roster, and digital entry pass modal with `.ics` calendar export.
-- **🛠️ Multi-Step Event Creation Wizard**: Basic details & image preview $\rightarrow$ Date, time & venue $\rightarrow$ Capacity, rules, pricing & interactive agenda builder $\rightarrow$ Save as Draft or Publish.
-- **🏛️ University Clubs / Communities**: Directory for GDSC, Robotics Society, E-Cell, Shutterbugs, KalaKriti Cultural Guild, and ACM Chapter with 1-click Join/Leave and upcoming/past event tabs.
-- **🤝 Student Networking**: Connect with peers across departments, manage incoming connection requests, and discover *"People You May Know"*.
-- **👤 Student Profiles**: Academic verification (University, Department, Year), skills tags, campus interests, hosted events, and interactive Edit Profile modal.
-- **📊 Organizer Analytics Dashboard**: KPI stat cards (Total Events, Total Registrations, Attendance Fill %, Upcoming Events), category turnout charts, attendee management modal, and CSV export for registration desks.
-- **🔔 Real-Time Notification Center**: Unread badge counter in top navigation, automatic alerts on registrations, connection requests, and club announcements.
-- **⚡ Universal Search (⌘K / Ctrl+K)**: Instant modal search across Events, Communities, and Students simultaneously.
-- **📱 Fully Responsive**: Bottom navigation bar on mobile, glassmorphism headers, and accessible modal dialogs.
+### For Students
+- **University Email Authentication**: Secure signup and signin powered by Supabase Auth.
+- **Dynamic Event Discovery**: Real-time event catalog with live seat counters, categorized by Technology, Hackathons, Cultural fests, Seminars, Sports meets, and more.
+- **Interactive Search & Filtering**: Instant, debounced full-text search with dynamic category pills and multi-criteria sorting (Upcoming Date, Latest Added, Registration Deadline) without reloading the page.
+- **Detailed Event Passes**: Complete event schedules, venues, rules, organizer details, and remaining seat tracking.
+- **One-Click Event Registration**: Automatic duplicate registration prevention (`UNIQUE(event_id, student_id)`) and deadline verification.
+- **My Registered Events Dashboard**: View confirmed tickets, registration dates, and cancel registrations with an animated confirmation modal.
+- **Personalized Profile Management**: Update student display name with real-time profile synchronization.
 
----
-
-## 🛠️ Technology Stack
-
-- **Frontend**: Next.js 14 (App Router), React 18, TypeScript
-- **Styling**: Tailwind CSS, PostCSS, Lucide Icons, Canvas Confetti
-- **Backend & Database**: Supabase (PostgreSQL, Supabase Auth, Row Level Security, Storage Buckets)
-- **State Management**: React Context (`AuthContext`, `EventContext`, `NotificationContext`, `ToastProvider`)
-- **Dual-Mode Engine**: Native `@supabase/supabase-js` client with an in-app Supabase Connection Manager & offline-first sync fallback.
+### For Campus Administrators
+- **Executive Admin Portal**: High-security login with role verification from the Supabase `profiles` table.
+- **Real-Time Analytics Dashboard**: Animated metric counters for Total Events, Active Upcoming Events, Total Registrations, and Total Students.
+- **Full Event Lifecycle Management (CRUD)**:
+  - Create new campus events with title, category, description, venue, organizer, deadline, seat quotas, and banner images.
+  - Modify existing events with immediate live reflection for students.
+  - Permanently delete events with cascading cancellation of associated registrations.
+- **Attendee Roster & Export**: Searchable participant registry filterable by individual events, with 1-click **Export to CSV** for coordinators.
 
 ---
 
-## 🚀 Quick Start
+## 💻 Tech Stack
 
-### 1. Clone the repository
-```bash
-git clone https://github.com/anujnehra004/Campus-Connect.git
-cd Campus-Connect
-```
+- **Frontend**: HTML5, Modern CSS3 (Vanilla design tokens, CSS variables, glassmorphism), Vanilla JavaScript (ES6+ Modules).
+- **Backend & Database**: [Supabase](https://supabase.com) (PostgreSQL 15+).
+- **Authentication**: Supabase Auth (Email & Password provider).
+- **Client SDK**: Supabase JavaScript Client via official CDN (`@supabase/supabase-js`).
+- **Typography**: Google Fonts (`Outfit` for bold modern headings, `Plus Jakarta Sans` for clean body typography).
+- **Animations**: GPU-accelerated CSS keyframe animations, micro-interactions, skeleton shimmer loaders, toast alerts, and `IntersectionObserver` scroll reveals.
 
-### 2. Install dependencies
-```bash
-npm install
-```
-
-### 3. Configure Environment Variables
-Copy `.env.local.example` to `.env.local`:
-```bash
-cp .env.local.example .env.local
-```
-Add your Supabase credentials:
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-```
-*(Note: If you run without Supabase credentials, Campus Connect automatically operates in interactive demo mode with 16 events, 6 clubs, 12 students, and all 14 flows operational!)*
-
-### 4. Run the Development Server
-```bash
-npm run dev
-```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### 5. Build for Production
-```bash
-npm run build
-npm run start
-```
+> **Zero Heavy Frameworks**: No React, Angular, Vue, Bootstrap, or Tailwind. Pure standards-compliant code that is straightforward to read, understand, and explain for CSE coursework.
 
 ---
 
-## 🗄️ Supabase Database Setup
-
-1. Go to your [Supabase Dashboard](https://supabase.com/dashboard) and create a new project.
-2. Open the **SQL Editor** in Supabase.
-3. Paste the contents of [`supabase/schema.sql`](./supabase/schema.sql) and click **Run** to generate tables, RLS policies, automated triggers, and storage buckets.
-4. Paste the contents of [`supabase/seed.sql`](./supabase/seed.sql) and click **Run** to populate 16 realistic university events, 6 communities, 12 students, registrations, bookmarks, and notifications.
-5. In Campus Connect, click the **"Demo Mode" / "Supabase Active"** badge in the navbar, paste your Supabase URL & Anon Key, and click **Connect**.
-
----
-
-## 📁 Project Structure
+## 📁 Clean Folder Structure
 
 ```
 campus-connect/
-├── public/
-├── src/
-│   ├── app/
-│   │   ├── (auth)/
-│   │   │   ├── login/page.tsx        # Sign in with 1-click test personas
-│   │   │   ├── signup/page.tsx       # Multi-step student onboarding
-│   │   │   ├── forgot-password/page.tsx
-│   │   │   └── reset-password/page.tsx
-│   │   ├── communities/
-│   │   │   ├── page.tsx              # Club directory
-│   │   │   └── [id]/page.tsx         # Single club hub & join toggle
-│   │   ├── connections/page.tsx      # Student networking center
-│   │   ├── dashboard/page.tsx        # Main student dashboard
-│   │   ├── events/
-│   │   │   ├── [id]/page.tsx         # Event details & tickets
-│   │   │   └── create/page.tsx       # Multi-step event creation wizard
-│   │   ├── explore/page.tsx          # Event Explorer with faceted filters
-│   │   ├── my-events/page.tsx        # Registered, Saved, Created, Attended
-│   │   ├── notifications/page.tsx    # Notifications center
-│   │   ├── organizer/page.tsx        # Organizer analytics & CSV export
-│   │   ├── profile/
-│   │   │   ├── page.tsx              # Personal student profile & edit modal
-│   │   │   └── [id]/page.tsx         # Public student profile
-│   │   ├── globals.css               # Tailwind & micro-interactions
-│   │   ├── layout.tsx                # Root layout with providers & Navbar
-│   │   └── page.tsx                  # High-impact landing page
-│   ├── components/
-│   │   ├── communities/              # CommunityCard
-│   │   ├── connections/              # ConnectionCard
-│   │   ├── events/                   # EventCard, EventFilters, EventRegistrationModal, AttendeeListModal
-│   │   ├── layout/                   # Navbar, Footer, MobileNav
-│   │   ├── search/                   # GlobalSearchModal (⌘K)
-│   │   └── ui/                       # Button, Input, Badge, Modal, Tabs, Toast, Skeleton, SupabaseConfigModal
-│   ├── context/                      # AuthContext, EventContext, NotificationContext
-│   └── lib/                          # types.ts, utils.ts, storage.ts, client.ts, initialData.ts
-├── supabase/
-│   ├── schema.sql                    # Production PostgreSQL DDL, RLS & triggers
-│   └── seed.sql                      # Realistic sample seed data
-├── tailwind.config.js
-├── tsconfig.json
-├── package.json
-└── README.md
+│
+├── index.html                  # Landing page with hero, statistics & featured events
+├── login.html                  # Student sign-in page with 1-click demo filler
+├── signup.html                 # Student registration page with input validation
+├── events.html                 # Complete event discovery catalog with search & filters
+├── event-details.html          # Dynamic event details page (?id=...) & registration action
+├── my-events.html              # Student dashboard & registered passes manager
+├── profile.html                # Student profile settings
+│
+├── admin-login.html            # Dedicated administrator portal login
+├── admin-dashboard.html        # Executive metrics dashboard & recent events
+├── admin-events.html           # Full event management roster (Edit, Delete, View)
+├── admin-add-event.html        # Form to publish new campus events
+├── admin-edit-event.html       # Form to modify existing events
+├── admin-participants.html     # Registered attendee roster with CSV export
+│
+├── css/
+│   ├── style.css               # Design system tokens, glassmorphism & component styles
+│   ├── animations.css          # CSS keyframes, loading spinners, and scroll reveal
+│   └── responsive.css          # Breakpoints for desktop, tablet, and mobile
+│
+├── js/
+│   ├── supabase.js             # Supabase client setup & out-of-the-box fallback demo layer
+│   ├── auth.js                 # Authentication logic, sessions, and route guards
+│   ├── events.js               # Event fetching, formatting, search, and card rendering
+│   ├── student.js              # Student registrations, pass management, and profile update
+│   ├── admin.js                # Admin dashboard metrics, event CRUD, and CSV exporter
+│   └── ui.js                   # Toast notifications, dialog modals, counters & navbars
+│
+├── assets/
+│   └── images/                 # Local media assets and campus icons
+│
+├── supabase.sql                # Complete PostgreSQL DDL, triggers, RLS policies & seed data
+└── README.md                   # Comprehensive project documentation
 ```
 
 ---
 
-## 📄 License
-This project is open-source and available under the [MIT License](LICENSE).
+## ⚙️ Supabase Setup Guide
+
+Follow these steps to connect your live Supabase database and authentication in under 5 minutes:
+
+### Step 1: Create a Free Supabase Project
+1. Visit [supabase.com](https://supabase.com) and click **Start your project**.
+2. Name your project (e.g., `Campus Connect`) and choose a strong database password.
+
+### Step 2: Run Database Setup SQL
+1. In the Supabase Dashboard left menu, click **SQL Editor** (`</>`).
+2. Open `supabase.sql` from this repository, copy all contents, paste them into the SQL Editor, and click **Run**.
+3. This creates:
+   - `profiles` table (with role check `'student'` or `'admin'`).
+   - `events` table (with sample university events).
+   - `registrations` table (with `UNIQUE(event_id, student_id)` constraint).
+   - Foreign keys, automated `update_updated_at_column()` and `handle_new_user()` triggers.
+   - Row Level Security (RLS) policies.
+
+### Step 3: Enable Email / Password Authentication
+1. Go to **Authentication** -> **Providers** in the Supabase Dashboard.
+2. Ensure **Email** is set to **Enabled**.
+3. (Recommended for local testing) In **Authentication** -> **URL Configuration**, turn off "Confirm email" if you want instant login without waiting for email verification links.
+
+### Step 4: Create Demo Users in Supabase
+Navigate to **Authentication** -> **Users** and click **Add User** -> **Create User**:
+
+#### 1. Student Demo User:
+- **Email**: `student@university.edu`
+- **Password**: `student123`
+- **Auto Confirm User**: `ON`
+- **User Metadata**: `{"name": "Alex Johnson", "role": "student"}`
+
+#### 2. Admin Demo User:
+- **Email**: `admin@campusconnect.edu`
+- **Password**: `Admin@123`
+- **Auto Confirm User**: `ON`
+- **User Metadata**: `{"name": "Campus Administrator", "role": "admin"}`
+
+*(Optional)* Run this query in the SQL Editor to ensure the admin profile role is saved:
+```sql
+UPDATE public.profiles
+SET role = 'admin'
+WHERE email = 'admin@campusconnect.edu';
+```
+
+### Step 5: Configure Frontend Credentials
+Open [js/supabase.js](file:///C:/Users/ADMIN/.gemini/antigravity/scratch/campus-connect/js/supabase.js) and update the `SUPABASE_CONFIG` object with your project details:
+
+```javascript
+const SUPABASE_CONFIG = {
+  URL: 'https://xyzcompany.supabase.co',        // Found in Project Settings -> API -> Project URL
+  ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6...'  // Found in Project Settings -> API -> Project API Keys (anon public)
+};
+```
+
+> ⚠️ **Security Reminder**: **NEVER** expose your `service_role` key in frontend code. Only use the `anon` public key. Supabase Row Level Security (RLS) protects all data based on the authenticated user's session.
+
+---
+
+## 🚀 How to Run Locally
+
+### Option 1: VS Code Live Server (Recommended)
+1. Open the `campus-connect` folder in Visual Studio Code.
+2. Install the **Live Server** extension (by Ritwick Dey).
+3. Right-click [index.html](file:///C:/Users/ADMIN/.gemini/antigravity/scratch/campus-connect/index.html) and select **Open with Live Server**.
+
+### Option 2: Python Static HTTP Server
+Run from the `campus-connect` directory in your terminal:
+```bash
+python -m http.server 8080
+```
+Then open `http://localhost:8080` in your web browser.
+
+---
+
+## 🔑 Demo Credentials
+
+For quick grading and demonstrations, 1-click **Auto-Fill** buttons are provided on both login pages:
+
+| Role | Email | Password | Access Portal |
+|---|---|---|---|
+| **Student** | `student@university.edu` | `student123` | [login.html](file:///C:/Users/ADMIN/.gemini/antigravity/scratch/campus-connect/login.html) |
+| **Admin** | `admin@campusconnect.edu` | `Admin@123` | [admin-login.html](file:///C:/Users/ADMIN/.gemini/antigravity/scratch/campus-connect/admin-login.html) |
+
+---
+
+## 🔒 Row Level Security (RLS) Architecture
+
+Campus Connect implements strict PostgreSQL Row Level Security:
+
+1. **Events Table**:
+   - `SELECT`: Public access (anyone can view upcoming events).
+   - `INSERT`, `UPDATE`, `DELETE`: Restricted to authenticated users with `role = 'admin'` in `profiles`.
+2. **Registrations Table**:
+   - `SELECT`: Students can only read their own registrations (`student_id = auth.uid()`); admins can read all registrations.
+   - `INSERT`: Students can only register themselves (`student_id = auth.uid()`).
+   - `UPDATE`: Students can modify their own booking status (e.g. `cancelled`).
+3. **Profiles Table**:
+   - Students can view and update their own name; admins can view all user profiles for roster generation.
+
+---
+
+## 🔮 Future Improvements
+- QR Code ticket generator for contactless entry check-in on event day.
+- Direct automated email calendar invites (.ics attachment) upon registration.
+- Student club leader submission workflow with administrative review and approval.

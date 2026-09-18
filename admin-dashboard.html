@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Campus Connect</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Minimal Top Bar -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-logo" style="background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);">🛡️</div>
+        <span>Campus<span class="text-secondary">Admin</span></span>
+      </a>
+
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <span id="admin-user-email" style="font-size: 0.85rem; color: var(--text-muted);">admin@campusconnect.edu</span>
+        <button class="btn btn-ghost btn-sm" onclick="authManager.logout()" style="color: #fda4af;">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Admin Layout with Sidebar -->
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+      <div class="dashboard-sidebar-header">
+        <span class="sidebar-title">Administration</span>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li>
+          <a href="admin-dashboard.html" class="sidebar-link active">
+            <span class="sidebar-link-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="admin-events.html" class="sidebar-link">
+            <span class="sidebar-link-icon">📅</span>
+            <span>Manage Events</span>
+          </a>
+        </li>
+        <li>
+          <a href="admin-add-event.html" class="sidebar-link">
+            <span class="sidebar-link-icon">➕</span>
+            <span>Add New Event</span>
+          </a>
+        </li>
+        <li>
+          <a href="admin-participants.html" class="sidebar-link">
+            <span class="sidebar-link-icon">👥</span>
+            <span>Participants</span>
+          </a>
+        </li>
+        <li>
+          <a href="events.html" target="_blank" class="sidebar-link">
+            <span class="sidebar-link-icon">🌐</span>
+            <span>Live Student View ↗</span>
+          </a>
+        </li>
+        <li style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-subtle);">
+          <a href="#" onclick="authManager.logout(); return false;" class="sidebar-link" style="color: #fda4af;">
+            <span class="sidebar-link-icon">🚪</span>
+            <span>Logout</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="dashboard-main">
+      <div class="dashboard-header-bar">
+        <div>
+          <span class="badge-tag" style="background: rgba(139, 92, 246, 0.15); border-color: rgba(139, 92, 246, 0.4); color: #c084fc;">
+            Administrative Overview
+          </span>
+          <h1 style="font-size: 2rem; margin-top: 4px;">Executive Dashboard</h1>
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+          <a href="admin-add-event.html" class="btn btn-purple btn-sm">
+            + Publish New Event
+          </a>
+          <a href="admin-participants.html" class="btn btn-secondary btn-sm">
+            View Registrations
+          </a>
+        </div>
+      </div>
+
+      <!-- Dashboard Statistics Cards (Animated) -->
+      <div class="stats-grid" style="margin-bottom: 36px;">
+        <div class="stat-card">
+          <div class="stat-number" id="stat-total-events">0</div>
+          <div class="stat-label">Total Events</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="stat-upcoming-events">0</div>
+          <div class="stat-label">Upcoming Events</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="stat-total-registrations">0</div>
+          <div class="stat-label">Total Registrations</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="stat-total-students">0</div>
+          <div class="stat-label">Total Students</div>
+        </div>
+      </div>
+
+      <!-- Recent Events Table -->
+      <div class="table-card">
+        <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between;">
+          <h2 style="font-size: 1.25rem;">Recent Campus Events</h2>
+          <a href="admin-events.html" class="btn btn-secondary btn-sm">View All Events →</a>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Venue</th>
+                <th>Registrations</th>
+                <th>Status</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="recent-events-tbody">
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 40px;">
+                  <span class="spinner"></span>
+                  <div class="text-muted" style="margin-top: 10px;">Loading live database events...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Delete Event Confirmation Dialog -->
+  <dialog id="delete-modal" closedby="any">
+    <div class="modal-header">
+      <h3 style="font-size: 1.2rem; color: #fda4af;">Delete Event</h3>
+      <button type="button" class="btn btn-ghost btn-sm" data-dismiss="dialog">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="color: var(--text-muted); margin-bottom: 12px;">
+        Are you sure you want to delete <strong id="delete-event-title" style="color: #fff;">this event</strong>?
+      </p>
+      <p style="font-size: 0.85rem; color: var(--accent-rose);">
+        This action permanently deletes the event and all associated student registrations from Supabase.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary btn-sm" data-dismiss="dialog">Cancel</button>
+      <button type="button" class="btn btn-danger btn-sm" id="btn-confirm-delete">Delete Permanently</button>
+    </div>
+  </dialog>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/admin.js"></script>
+
+  <script>
+    let pendingDeleteId = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Guard route: verify admin credentials
+      const isAdmin = await authManager.requireAdminAuth();
+      if (!isAdmin) return;
+
+      const profile = await authManager.getUserProfile();
+      if (profile?.email) {
+        document.getElementById('admin-user-email').textContent = profile.email;
+      }
+
+      await loadDashboardData();
+    });
+
+    async function loadDashboardData() {
+      // 1. Load Stats
+      const stats = await adminManager.getDashboardStats();
+      animateCounter(document.getElementById('stat-total-events'), stats.totalEvents);
+      animateCounter(document.getElementById('stat-upcoming-events'), stats.upcomingEvents);
+      animateCounter(document.getElementById('stat-total-registrations'), stats.totalRegistrations);
+      animateCounter(document.getElementById('stat-total-students'), stats.totalStudents);
+
+      // 2. Load Recent Events
+      const tbody = document.getElementById('recent-events-tbody');
+      try {
+        const events = await eventsManager.getAllEvents();
+        const recent = events.slice(0, 6);
+
+        if (recent.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 40px;" class="text-muted">
+                No events in database. <a href="admin-add-event.html" style="color: var(--primary);">Create your first event</a>.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        let html = '';
+        for (const evt of recent) {
+          const regCount = await eventsManager.getEventRegistrationCount(evt.id);
+          const isUpcoming = new Date(evt.date) >= new Date();
+
+          html += `
+            <tr>
+              <td>
+                <div style="font-weight: 700; color: #fff;">${evt.title}</div>
+                <div style="font-size: 0.8rem; color: var(--text-dim);">By ${evt.organizer}</div>
+              </td>
+              <td>
+                <span class="event-category-badge" style="position: static; display: inline-block;">${evt.category}</span>
+              </td>
+              <td>
+                <div style="font-weight: 600;">${eventsManager.formatDate(evt.date)}</div>
+                <div style="font-size: 0.8rem; color: var(--text-dim);">${evt.time}</div>
+              </td>
+              <td>${evt.venue}</td>
+              <td>
+                <span style="font-weight: 700; color: var(--accent-emerald);">${regCount}</span> / ${evt.max_participants || 100}
+              </td>
+              <td>
+                <span class="status-badge ${isUpcoming ? 'status-registered' : 'status-cancelled'}">
+                  ${isUpcoming ? '● Active' : '● Past'}
+                </span>
+              </td>
+              <td style="text-align: right;">
+                <div style="display: flex; justify-content: flex-end; gap: 6px;">
+                  <a href="event-details.html?id=${evt.id}" target="_blank" class="btn btn-secondary btn-sm" title="Live Preview">
+                    View
+                  </a>
+                  <a href="admin-edit-event.html?id=${evt.id}" class="btn btn-secondary btn-sm" title="Edit Event">
+                    Edit
+                  </a>
+                  <button class="btn btn-danger btn-sm" onclick="promptDelete('${evt.id}', '${evt.title.replace(/'/g, "\\'")}')">
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }
+        tbody.innerHTML = html;
+      } catch (err) {
+        console.error('Dashboard load error:', err);
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; color: var(--accent-rose); padding: 30px;">
+              Failed to load recent events from database.
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    const deleteModal = document.getElementById('delete-modal');
+    const deleteTitleEl = document.getElementById('delete-event-title');
+    const confirmDeleteBtn = document.getElementById('btn-confirm-delete');
+
+    window.promptDelete = (id, title) => {
+      pendingDeleteId = id;
+      deleteTitleEl.textContent = title;
+      deleteModal.showModal();
+    };
+
+    confirmDeleteBtn.addEventListener('click', async () => {
+      if (!pendingDeleteId) return;
+
+      confirmDeleteBtn.disabled = true;
+      confirmDeleteBtn.innerHTML = '<span class="spinner"></span> Deleting...';
+
+      try {
+        await adminManager.deleteEvent(pendingDeleteId);
+        showToast('Event deleted permanently.', 'success');
+        deleteModal.close();
+        await loadDashboardData();
+      } catch (err) {
+        showToast(err.message || 'Failed to delete event.', 'error');
+      } finally {
+        confirmDeleteBtn.disabled = false;
+        confirmDeleteBtn.textContent = 'Delete Permanently';
+      }
+    });
+  </script>
+</body>
+</html>

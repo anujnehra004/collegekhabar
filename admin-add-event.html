@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create New Event | Campus Connect Admin</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-logo" style="background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);">🛡️</div>
+        <span>Campus<span class="text-secondary">Admin</span></span>
+      </a>
+
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <span id="admin-user-email" style="font-size: 0.85rem; color: var(--text-muted);">admin@campusconnect.edu</span>
+        <button class="btn btn-ghost btn-sm" onclick="authManager.logout()" style="color: #fda4af;">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+      <div class="dashboard-sidebar-header">
+        <span class="sidebar-title">Administration</span>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li>
+          <a href="admin-dashboard.html" class="sidebar-link">
+            <span class="sidebar-link-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="admin-events.html" class="sidebar-link">
+            <span class="sidebar-link-icon">📅</span>
+            <span>Manage Events</span>
+          </a>
+        </li>
+        <li>
+          <a href="admin-add-event.html" class="sidebar-link active">
+            <span class="sidebar-link-icon">➕</span>
+            <span>Add New Event</span>
+          </a>
+        </li>
+        <li>
+          <a href="admin-participants.html" class="sidebar-link">
+            <span class="sidebar-link-icon">👥</span>
+            <span>Participants</span>
+          </a>
+        </li>
+        <li>
+          <a href="events.html" target="_blank" class="sidebar-link">
+            <span class="sidebar-link-icon">🌐</span>
+            <span>Live Student View ↗</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <main class="dashboard-main" style="max-width: 900px;">
+      <div class="dashboard-header-bar">
+        <div>
+          <span class="badge-tag">Publishing</span>
+          <h1 style="font-size: 2rem; margin-top: 4px;">Create New Campus Event</h1>
+        </div>
+        <a href="admin-events.html" class="btn btn-secondary btn-sm">Cancel</a>
+      </div>
+
+      <div class="auth-card" style="max-width: 100%; padding: 36px;">
+        <form id="add-event-form">
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+            <div class="form-group">
+              <label class="form-label" for="event-title">Event Title *</label>
+              <input type="text" id="event-title" class="form-input" placeholder="e.g. AI & Robotics Hackathon 2026" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event-category">Category *</label>
+              <select id="event-category" class="form-input" required>
+                <option value="Technology">Technology</option>
+                <option value="Hackathon">Hackathon</option>
+                <option value="Workshop">Workshop</option>
+                <option value="Cultural">Cultural</option>
+                <option value="Sports">Sports</option>
+                <option value="Seminar">Seminar</option>
+                <option value="Competition">Competition</option>
+                <option value="Club Activity">Club Activity</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="event-description">Event Description *</label>
+            <textarea id="event-description" class="form-input form-textarea" rows="4" placeholder="Detailed summary of agendas, learning outcomes, and festival activities..." required></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+              <label class="form-label" for="event-date">Event Date *</label>
+              <input type="date" id="event-date" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event-time">Time Duration *</label>
+              <input type="text" id="event-time" class="form-input" placeholder="e.g. 10:00 AM - 4:00 PM" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+              <label class="form-label" for="event-venue">Venue *</label>
+              <input type="text" id="event-venue" class="form-input" placeholder="e.g. Main Auditorium / Innovation Lab" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event-organizer">Organizer / Student Club *</label>
+              <input type="text" id="event-organizer" class="form-input" placeholder="e.g. Computer Science Club" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+              <label class="form-label" for="event-deadline">Registration Deadline *</label>
+              <input type="date" id="event-deadline" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event-max-participants">Maximum Participant Seats *</label>
+              <input type="number" id="event-max-participants" class="form-input" min="1" max="5000" value="150" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="event-image-url">Event Banner Image URL</label>
+            <input type="url" id="event-image-url" class="form-input" placeholder="https://images.unsplash.com/..." value="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80">
+            <small style="color: var(--text-dim); display: block; margin-top: 6px;">
+              Quick picks:
+              <a href="#" onclick="setImage('https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80'); return false;" style="color: var(--primary); margin-left: 6px;">Tech</a> |
+              <a href="#" onclick="setImage('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80'); return false;" style="color: var(--primary); margin-left: 6px;">Hackathon</a> |
+              <a href="#" onclick="setImage('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80'); return false;" style="color: var(--primary); margin-left: 6px;">Cultural</a> |
+              <a href="#" onclick="setImage('https://images.unsplash.com/photo-1531415074868-036b1c57e329?auto=format&fit=crop&w=1200&q=80'); return false;" style="color: var(--primary); margin-left: 6px;">Sports</a>
+            </small>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 14px; margin-top: 32px;">
+            <a href="admin-events.html" class="btn btn-secondary">Discard</a>
+            <button type="submit" id="btn-create-event" class="btn btn-purple btn-lg">
+              Create Event & Publish
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/admin.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const isAdmin = await authManager.requireAdminAuth();
+      if (!isAdmin) return;
+
+      const profile = await authManager.getUserProfile();
+      if (profile?.email) {
+        document.getElementById('admin-user-email').textContent = profile.email;
+      }
+    });
+
+    window.setImage = (url) => {
+      document.getElementById('event-image-url').value = url;
+    };
+
+    document.getElementById('add-event-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const btn = document.getElementById('btn-create-event');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Creating event in Supabase...';
+
+      const eventData = {
+        title: document.getElementById('event-title').value.trim(),
+        category: document.getElementById('event-category').value,
+        description: document.getElementById('event-description').value.trim(),
+        date: document.getElementById('event-date').value,
+        time: document.getElementById('event-time').value.trim(),
+        venue: document.getElementById('event-venue').value.trim(),
+        organizer: document.getElementById('event-organizer').value.trim(),
+        registration_deadline: document.getElementById('event-deadline').value,
+        max_participants: document.getElementById('event-max-participants').value,
+        image_url: document.getElementById('event-image-url').value.trim()
+      };
+
+      try {
+        await adminManager.createEvent(eventData);
+        showToast('Event published successfully!', 'success');
+        setTimeout(() => {
+          window.location.href = 'admin-events.html';
+        }, 900);
+      } catch (err) {
+        showToast(err.message || 'Failed to create event.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = 'Create Event & Publish';
+      }
+    });
+  </script>
+</body>
+</html>

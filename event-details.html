@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Details | Campus Connect</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-logo">🎓</div>
+        <span>Campus<span class="text-primary">Connect</span></span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="events.html" class="nav-link active">Events</a></li>
+          <li><a href="my-events.html" class="nav-link">My Events</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="login.html" class="btn btn-ghost btn-sm">Login</a>
+        <a href="signup.html" class="btn btn-primary btn-sm">Get Started</a>
+      </div>
+
+      <button class="nav-toggle" aria-label="Toggle navigation menu">☰</button>
+    </div>
+  </header>
+
+  <main class="container" id="details-container">
+    <div style="padding: 60px 0; text-align: center;">
+      <span class="spinner" style="width: 32px; height: 32px;"></span>
+      <p class="text-muted" style="margin-top: 14px;">Loading event details from Supabase...</p>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="border-top: none; padding-top: 0;">
+        <p>&copy; 2026 Campus Connect. All rights reserved. University Event Management System.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/student.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const container = document.getElementById('details-container');
+      const urlParams = new URLSearchParams(window.location.search);
+      const eventId = urlParams.get('id');
+
+      if (!eventId) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 80px 20px;">
+            <div style="font-size: 3rem; margin-bottom: 16px;">⚠️</div>
+            <h2 style="font-size: 1.8rem; margin-bottom: 12px;">Event Not Found</h2>
+            <p class="text-muted" style="margin-bottom: 24px;">No event ID was specified in the URL.</p>
+            <a href="events.html" class="btn btn-primary">Browse All Events</a>
+          </div>
+        `;
+        return;
+      }
+
+      try {
+        const event = await eventsManager.getEventById(eventId);
+        if (!event) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 80px 20px;">
+              <div style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
+              <h2 style="font-size: 1.8rem; margin-bottom: 12px;">Event Not Found</h2>
+              <p class="text-muted" style="margin-bottom: 24px;">We couldn't locate an event matching this ID.</p>
+              <a href="events.html" class="btn btn-primary">Browse All Events</a>
+            </div>
+          `;
+          return;
+        }
+
+        // Fetch registration count & student's current status
+        const regCount = await eventsManager.getEventRegistrationCount(eventId);
+        const maxParticipants = event.max_participants || 100;
+        let availableSeats = Math.max(0, maxParticipants - regCount);
+
+        const userData = await authManager.getCurrentUser();
+        let isAlreadyRegistered = false;
+        if (userData?.user) {
+          isAlreadyRegistered = await studentManager.checkIfRegistered(eventId, userData.user.id);
+        }
+
+        // Check deadline
+        let isExpired = false;
+        if (event.registration_deadline) {
+          const today = new Date();
+          today.setHours(0,0,0,0);
+          const deadline = new Date(event.registration_deadline);
+          if (today > deadline) isExpired = true;
+        }
+
+        const placeholderImg = 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80';
+        const heroImg = event.image_url || placeholderImg;
+
+        container.innerHTML = `
+          <!-- Breadcrumb navigation -->
+          <div style="margin-top: 24px; font-size: 0.88rem; color: var(--text-dim); display: flex; align-items: center; gap: 8px;">
+            <a href="events.html" style="color: var(--text-muted);">Events</a>
+            <span>/</span>
+            <span style="color: var(--primary);">${event.category}</span>
+            <span>/</span>
+            <span style="color: var(--text-main);">${event.title}</span>
+          </div>
+
+          <!-- Hero Image Banner -->
+          <div class="event-details-hero">
+            <img src="${heroImg}" alt="${event.title}" class="event-details-bg" onerror="this.src='${placeholderImg}'">
+            <div class="event-details-overlay">
+              <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+                <span class="event-category-badge" style="position: static;">${event.category}</span>
+                <span class="badge-tag" style="margin: 0; background: rgba(0,0,0,0.6); border-color: rgba(255,255,255,0.2); color: #fff;">
+                  Organized by ${event.organizer}
+                </span>
+              </div>
+              <h1 style="font-size: 2.8rem; margin-bottom: 8px; color: #fff;">${event.title}</h1>
+            </div>
+          </div>
+
+          <!-- Content and Registration Grid -->
+          <div class="details-grid">
+            <!-- Left Column: Rich Description & Information -->
+            <div>
+              <div class="details-content-card">
+                <h2 style="font-size: 1.4rem; margin-bottom: 16px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px;">
+                  About This Event
+                </h2>
+                <p style="font-size: 1.05rem; line-height: 1.7; color: var(--text-muted); margin-bottom: 24px;">
+                  ${event.description}
+                </p>
+
+                <h3 style="font-size: 1.2rem; margin-bottom: 14px; margin-top: 30px;">Event Schedule</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px;">
+                  <div style="display: flex; gap: 14px; padding: 12px; background: var(--bg-surface); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                    <div style="font-weight: 700; color: var(--primary); min-width: 110px;">Check-in:</div>
+                    <div style="color: var(--text-muted);">30 minutes prior to scheduled session time.</div>
+                  </div>
+                  <div style="display: flex; gap: 14px; padding: 12px; background: var(--bg-surface); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                    <div style="font-weight: 700; color: var(--primary); min-width: 110px;">Keynote/Intro:</div>
+                    <div style="color: var(--text-muted);">Introductory remarks and event kickoff guidelines.</div>
+                  </div>
+                  <div style="display: flex; gap: 14px; padding: 12px; background: var(--bg-surface); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                    <div style="font-weight: 700; color: var(--primary); min-width: 110px;">Main Activity:</div>
+                    <div style="color: var(--text-muted);">${event.time} — Key challenges and collaborative sessions.</div>
+                  </div>
+                </div>
+
+                <h3 style="font-size: 1.2rem; margin-bottom: 14px;">Participation Rules & Guidelines</h3>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; color: var(--text-muted); font-size: 0.95rem;">
+                  <li style="display: flex; gap: 10px;"><span class="text-primary">✓</span> Valid university ID card mandatory for venue entry.</li>
+                  <li style="display: flex; gap: 10px;"><span class="text-primary">✓</span> Maintain academic integrity and collegiate sportsmanship.</li>
+                  <li style="display: flex; gap: 10px;"><span class="text-primary">✓</span> Participants must bring their own required equipment (e.g. laptops for hackathons/seminars).</li>
+                </ul>
+
+                <h3 style="font-size: 1.2rem; margin-bottom: 14px; margin-top: 30px;">Contact Information</h3>
+                <p style="font-size: 0.92rem; color: var(--text-muted);">
+                  For queries or accommodations, reach out to the <strong>${event.organizer}</strong> desk at <code style="color: var(--accent-cyan); background: var(--bg-surface); padding: 2px 8px; border-radius: 4px;">events@university.edu</code> or visit the Student Affairs Center.
+                </p>
+              </div>
+            </div>
+
+            <!-- Right Column: Quick Info & Registration Action -->
+            <div>
+              <div class="details-sidebar-card">
+                <h3 style="font-size: 1.3rem; margin-bottom: 20px;">Event Overview</h3>
+
+                <div class="sidebar-info-row">
+                  <span class="text-muted">📅 Date</span>
+                  <span style="font-weight: 600;">${eventsManager.formatDate(event.date)}</span>
+                </div>
+
+                <div class="sidebar-info-row">
+                  <span class="text-muted">⏰ Time</span>
+                  <span style="font-weight: 600;">${event.time}</span>
+                </div>
+
+                <div class="sidebar-info-row">
+                  <span class="text-muted">📍 Venue</span>
+                  <span style="font-weight: 600;">${event.venue}</span>
+                </div>
+
+                <div class="sidebar-info-row">
+                  <span class="text-muted">👥 Organizer</span>
+                  <span style="font-weight: 600;">${event.organizer}</span>
+                </div>
+
+                <div class="sidebar-info-row">
+                  <span class="text-muted">⏳ Reg. Deadline</span>
+                  <span style="font-weight: 600; color: ${isExpired ? 'var(--accent-rose)' : 'inherit'};">
+                    ${eventsManager.formatDate(event.registration_deadline)}
+                  </span>
+                </div>
+
+                <div class="sidebar-info-row">
+                  <span class="text-muted">🎟️ Available Seats</span>
+                  <span id="seats-counter" style="font-weight: 700; color: var(--accent-emerald);">
+                    ${availableSeats} / ${maxParticipants}
+                  </span>
+                </div>
+
+                <!-- Participation Button Area -->
+                <div style="margin-top: 28px;" id="action-btn-container">
+                  <!-- Dynamically rendered based on state -->
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        renderParticipationButton(isAlreadyRegistered, availableSeats, isExpired);
+
+      } catch (err) {
+        console.error('Error loading event:', err);
+        container.innerHTML = `
+          <div style="text-align: center; padding: 60px 20px;">
+            <p class="text-rose">An error occurred while loading this event. Please try again.</p>
+          </div>
+        `;
+      }
+
+      function renderParticipationButton(registered, seatsLeft, expired) {
+        const btnContainer = document.getElementById('action-btn-container');
+        if (!btnContainer) return;
+
+        if (registered) {
+          btnContainer.innerHTML = `
+            <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: var(--radius-md); padding: 14px; text-align: center; margin-bottom: 12px;">
+              <div style="color: #6ee7b7; font-weight: 700; margin-bottom: 4px;">✓ You Are Registered!</div>
+              <p style="font-size: 0.8rem; color: var(--text-muted);">Your seat is reserved for this event.</p>
+            </div>
+            <a href="my-events.html" class="btn btn-secondary btn-block">View in My Events →</a>
+          `;
+          return;
+        }
+
+        if (expired) {
+          btnContainer.innerHTML = `
+            <button class="btn btn-secondary btn-block btn-lg" disabled>
+              Registration Closed
+            </button>
+            <p style="font-size: 0.8rem; color: var(--accent-rose); text-align: center; margin-top: 8px;">
+              The deadline for registration has passed.
+            </p>
+          `;
+          return;
+        }
+
+        if (seatsLeft <= 0) {
+          btnContainer.innerHTML = `
+            <button class="btn btn-secondary btn-block btn-lg" disabled>
+              Event Full (Sold Out)
+            </button>
+            <p style="font-size: 0.8rem; color: var(--accent-amber); text-align: center; margin-top: 8px;">
+              Maximum seat capacity reached.
+            </p>
+          `;
+          return;
+        }
+
+        btnContainer.innerHTML = `
+          <button id="btn-participate" class="btn btn-primary btn-block btn-lg">
+            Participate in Event 🚀
+          </button>
+          <p style="font-size: 0.78rem; color: var(--text-dim); text-align: center; margin-top: 10px;">
+            Instant seat confirmation via Supabase
+          </p>
+        `;
+
+        const participateBtn = document.getElementById('btn-participate');
+        participateBtn.addEventListener('click', async () => {
+          participateBtn.disabled = true;
+          participateBtn.innerHTML = '<span class="spinner"></span> Registering...';
+
+          const res = await studentManager.registerForEvent(eventId);
+
+          if (res.success) {
+            // Re-render button state
+            renderParticipationButton(true, seatsLeft - 1, false);
+            const seatsEl = document.getElementById('seats-counter');
+            if (seatsEl) {
+              seatsEl.textContent = `${Math.max(0, seatsLeft - 1)} / ${event.max_participants || 100}`;
+            }
+          } else {
+            participateBtn.disabled = false;
+            participateBtn.innerHTML = 'Participate in Event 🚀';
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

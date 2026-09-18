@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Registered Events | Campus Connect</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-logo">🎓</div>
+        <span>Campus<span class="text-primary">Connect</span></span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="events.html" class="nav-link">Events</a></li>
+          <li><a href="my-events.html" class="nav-link active">My Events</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Filled dynamically by updateNavAuthUI -->
+      </div>
+
+      <button class="nav-toggle" aria-label="Toggle navigation menu">☰</button>
+    </div>
+  </header>
+
+  <div class="container" style="padding-top: 36px; padding-bottom: 60px;">
+    <!-- Welcome Header & Quick Stats -->
+    <div class="section-header" style="margin-bottom: 30px;">
+      <div>
+        <span class="badge-tag">Student Portal</span>
+        <h1 class="section-title" id="welcome-title">Welcome back!</h1>
+        <p class="section-subtitle">Track your registered event passes, view schedules, or manage attendance.</p>
+      </div>
+      <div>
+        <a href="events.html" class="btn btn-primary">+ Browse More Events</a>
+      </div>
+    </div>
+
+    <!-- Student Dashboard Metrics -->
+    <div class="stats-grid" style="margin-bottom: 40px;">
+      <div class="stat-card">
+        <div class="stat-number" id="stat-total-reg">0</div>
+        <div class="stat-label">My Registrations</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="stat-active-events">0</div>
+        <div class="stat-label">Upcoming Passes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="stat-week-events">0</div>
+        <div class="stat-label">Events This Week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="stat-available-catalog">0</div>
+        <div class="stat-label">Available on Campus</div>
+      </div>
+    </div>
+
+    <!-- Registered Events Table Card -->
+    <div class="table-card">
+      <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between;">
+        <h2 style="font-size: 1.25rem;">Registered Events</h2>
+        <span id="reg-count-tag" style="font-size: 0.85rem; color: var(--text-muted);">Loading registrations...</span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Event Title</th>
+              <th>Category</th>
+              <th>Date & Time</th>
+              <th>Venue</th>
+              <th>Registered On</th>
+              <th>Status</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="registrations-tbody">
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 40px;">
+                <span class="spinner"></span>
+                <div class="text-muted" style="margin-top: 10px;">Loading your registrations...</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cancellation Confirmation Dialog -->
+  <dialog id="cancel-modal" closedby="any">
+    <div class="modal-header">
+      <h3 style="font-size: 1.2rem;">Cancel Registration</h3>
+      <button type="button" class="btn btn-ghost btn-sm" data-dismiss="dialog">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="color: var(--text-muted); margin-bottom: 12px;">
+        Are you sure you want to cancel your registration for <strong id="cancel-event-name" style="color: #fff;">this event</strong>?
+      </p>
+      <p style="font-size: 0.85rem; color: var(--accent-amber);">
+        Your seat will be released and made available to other students on campus.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary btn-sm" data-dismiss="dialog">Keep My Seat</button>
+      <button type="button" class="btn btn-danger btn-sm" id="btn-confirm-cancel">Confirm Cancellation</button>
+    </div>
+  </dialog>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="border-top: none; padding-top: 0;">
+        <p>&copy; 2026 Campus Connect. All rights reserved. University Event Management System.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/student.js"></script>
+
+  <script>
+    let activeRegistrations = [];
+    let pendingCancelId = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Guard route: require student login
+      const isAuthenticated = await authManager.requireStudentAuth();
+      if (!isAuthenticated) return;
+
+      // 2. Personalize welcome header
+      const profile = await authManager.getUserProfile();
+      if (profile?.name) {
+        document.getElementById('welcome-title').textContent = `Welcome back, ${profile.name}!`;
+      }
+
+      await loadRegistrations();
+    });
+
+    async function loadRegistrations() {
+      const tbody = document.getElementById('registrations-tbody');
+      const countTag = document.getElementById('reg-count-tag');
+
+      try {
+        activeRegistrations = await studentManager.getMyRegistrations();
+        const allCampusEvents = await eventsManager.getAllEvents();
+
+        // Calculate student dashboard stats
+        const totalReg = activeRegistrations.length;
+        const activeUpcoming = activeRegistrations.filter(r => r.status === 'registered' && r.events && new Date(r.events.date) >= new Date()).length;
+        
+        // Check this week
+        const now = new Date();
+        const nextWeek = new Date();
+        nextWeek.setDate(now.getDate() + 7);
+        const thisWeek = activeRegistrations.filter(r => {
+          if (r.status !== 'registered' || !r.events) return false;
+          const d = new Date(r.events.date);
+          return d >= now && d <= nextWeek;
+        }).length;
+
+        animateCounter(document.getElementById('stat-total-reg'), totalReg);
+        animateCounter(document.getElementById('stat-active-events'), activeUpcoming);
+        animateCounter(document.getElementById('stat-week-events'), thisWeek);
+        animateCounter(document.getElementById('stat-available-catalog'), allCampusEvents.length);
+
+        countTag.textContent = `${totalReg} total record${totalReg === 1 ? '' : 's'}`;
+
+        if (totalReg === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 60px 20px;">
+                <div style="font-size: 2.5rem; margin-bottom: 12px;">🎟️</div>
+                <h3 style="font-size: 1.2rem; margin-bottom: 8px;">No Registrations Yet</h3>
+                <p class="text-muted" style="margin-bottom: 20px;">You have not registered for any campus events yet.</p>
+                <a href="events.html" class="btn btn-primary btn-sm">Explore Upcoming Events →</a>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = activeRegistrations.map(reg => {
+          const evt = reg.events || {
+            title: 'Campus Event',
+            category: 'General',
+            date: '2026-10-10',
+            time: 'TBD',
+            venue: 'Main Campus',
+            id: reg.event_id
+          };
+
+          const isCancelled = reg.status === 'cancelled';
+          const badgeClass = isCancelled ? 'status-cancelled' : 'status-registered';
+
+          return `
+            <tr>
+              <td>
+                <div style="font-weight: 700; color: #fff;">${evt.title}</div>
+              </td>
+              <td>
+                <span class="event-category-badge" style="position: static; display: inline-block;">${evt.category}</span>
+              </td>
+              <td>
+                <div style="font-weight: 600;">${eventsManager.formatDate(evt.date)}</div>
+                <div style="font-size: 0.8rem; color: var(--text-dim);">${evt.time}</div>
+              </td>
+              <td>
+                <div style="color: var(--text-muted);">${evt.venue}</div>
+              </td>
+              <td style="font-size: 0.85rem; color: var(--text-muted);">
+                ${eventsManager.formatDate(reg.registered_at)}
+              </td>
+              <td>
+                <span class="status-badge ${badgeClass}">
+                  ${isCancelled ? '✕ Cancelled' : '✓ Registered'}
+                </span>
+              </td>
+              <td style="text-align: right;">
+                <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                  <a href="event-details.html?id=${evt.id}" class="btn btn-secondary btn-sm" title="View Details">
+                    View
+                  </a>
+                  ${!isCancelled ? `
+                    <button class="btn btn-danger btn-sm" onclick="promptCancel('${reg.id}', '${evt.title.replace(/'/g, "\\'")}')">
+                      Cancel
+                    </button>
+                  ` : ''}
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error('Error loading registrations:', err);
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; color: var(--accent-rose); padding: 30px;">
+              Could not load your registrations. Please check your network connection.
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    const cancelModal = document.getElementById('cancel-modal');
+    const cancelEventNameEl = document.getElementById('cancel-event-name');
+    const confirmCancelBtn = document.getElementById('btn-confirm-cancel');
+
+    window.promptCancel = (regId, eventTitle) => {
+      pendingCancelId = regId;
+      cancelEventNameEl.textContent = eventTitle;
+      cancelModal.showModal();
+    };
+
+    confirmCancelBtn.addEventListener('click', async () => {
+      if (!pendingCancelId) return;
+
+      confirmCancelBtn.disabled = true;
+      confirmCancelBtn.innerHTML = '<span class="spinner"></span> Cancelling...';
+
+      const success = await studentManager.cancelRegistration(pendingCancelId);
+      confirmCancelBtn.disabled = false;
+      confirmCancelBtn.textContent = 'Confirm Cancellation';
+      cancelModal.close();
+
+      if (success) {
+        await loadRegistrations();
+      }
+    });
+  </script>
+</body>
+</html>

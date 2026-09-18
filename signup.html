@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Registration | Campus Connect</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Minimal Header -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-logo">🎓</div>
+        <span>Campus<span class="text-primary">Connect</span></span>
+      </a>
+      <div class="nav-actions">
+        <a href="login.html" class="btn btn-secondary btn-sm">Already Registered? Login</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Signup Main -->
+  <main class="auth-page">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo">✨</div>
+        <h1 class="auth-title">Create Account</h1>
+        <p class="text-muted">Register with your university email to join campus hackathons, workshops, and sports meets.</p>
+      </div>
+
+      <form id="student-signup-form">
+        <div class="form-group">
+          <label class="form-label" for="fullname">Full Name</label>
+          <input type="text" id="fullname" class="form-input" placeholder="e.g. Alex Johnson" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">University Email</label>
+          <input type="email" id="email" class="form-input" placeholder="e.g. rollnumber@university.edu" required autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Create Password</label>
+          <input type="password" id="password" class="form-input" placeholder="Minimum 6 characters" required autocomplete="new-password" minlength="6">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="confirm-password">Confirm Password</label>
+          <input type="password" id="confirm-password" class="form-input" placeholder="Re-enter password" required autocomplete="new-password">
+        </div>
+
+        <button type="submit" id="btn-submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 10px;">
+          <span class="btn-text">Register as Student</span>
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 24px; font-size: 0.9rem; color: var(--text-muted);">
+        Already have an account? <a href="login.html" style="color: var(--primary); font-weight: 600;">Sign in here</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const form = document.getElementById('student-signup-form');
+    const submitBtn = document.getElementById('btn-submit');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('fullname').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+
+      if (!name || !email || !password) {
+        showToast('Please fill out all fields.', 'warning');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showToast('Passwords do not match. Please re-check.', 'error');
+        return;
+      }
+
+      if (password.length < 6) {
+        showToast('Password must be at least 6 characters.', 'warning');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner"></span> Creating account...';
+
+      try {
+        await authManager.signupStudent(name, email, password);
+        showToast('Account created successfully! Welcome to Campus Connect.', 'success');
+        setTimeout(() => {
+          window.location.href = 'my-events.html';
+        }, 1000);
+      } catch (err) {
+        console.error('Signup error:', err);
+        showToast(err.message || 'Signup failed. Please try again.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span class="btn-text">Register as Student</span>';
+      }
+    });
+  </script>
+</body>
+</html>

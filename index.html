@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Connect | University Event Management Platform</title>
+  <meta name="description" content="Discover workshops, hackathons, competitions, cultural events, seminars and more across campus.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Supabase JS Client CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-logo">🎓</div>
+        <span>Campus<span class="text-primary">Connect</span></span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link active">Home</a></li>
+          <li><a href="events.html" class="nav-link">Events</a></li>
+          <li><a href="#categories" class="nav-link">Categories</a></li>
+          <li><a href="#about" class="nav-link">About</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="login.html" class="btn btn-ghost btn-sm">Login</a>
+        <a href="signup.html" class="btn btn-primary btn-sm">Get Started</a>
+      </div>
+
+      <button class="nav-toggle" aria-label="Toggle navigation menu">☰</button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="ambient-mesh"></div>
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-content">
+          <div class="badge-tag">
+            <span class="badge-pulse"></span>
+            <span>Official University Portal</span>
+          </div>
+          <h1 class="hero-title">
+            Everything Happening <br>
+            <span class="gradient-text">Around Your Campus</span>
+          </h1>
+          <p class="hero-subtitle">
+            Discover workshops, hackathons, competitions, cultural events, seminars and more — all in one place. Connect with student clubs, secure your seat in seconds, and stay updated.
+          </p>
+          <div class="hero-cta">
+            <a href="events.html" class="btn btn-primary btn-lg">
+              Explore Events <span>→</span>
+            </a>
+            <a href="login.html" class="btn btn-secondary btn-lg">
+              Login to Participate
+            </a>
+          </div>
+
+          <!-- Quick trust indicators -->
+          <div style="display: flex; align-items: center; gap: 20px; font-size: 0.88rem; color: var(--text-dim);">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span class="text-emerald">✓</span> Instant Registration
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span class="text-emerald">✓</span> Real-Time Seat Tracking
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span class="text-emerald">✓</span> Verified Organizers
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="hero-visual-card">
+            <!-- Floating badge top -->
+            <div class="floating-badge badge-top">
+              <div class="badge-icon" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7;">🔥</div>
+              <div>
+                <div style="font-size: 0.78rem; color: var(--text-dim);">Trending Now</div>
+                <div style="font-size: 0.9rem; font-weight: 700;">TechFest 2026</div>
+              </div>
+            </div>
+
+            <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80" alt="TechFest preview" class="visual-preview-img">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <span class="event-category-badge" style="position: static;">Technology</span>
+              <span style="font-size: 0.8rem; color: var(--accent-emerald); font-weight: 600;">● Live Registration</span>
+            </div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 8px;">TechFest Annual Summit</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Coding competitions, project exhibitions, and innovation challenges with student creators.</p>
+            
+            <a href="events.html" class="btn btn-purple btn-block btn-sm">Reserve Seat Now</a>
+
+            <!-- Floating badge bottom -->
+            <div class="floating-badge badge-bottom">
+              <div class="badge-icon" style="background: rgba(59, 130, 246, 0.2); color: #93c5fd;">⚡</div>
+              <div>
+                <div style="font-size: 0.78rem; color: var(--text-dim);">Community Impact</div>
+                <div style="font-size: 0.9rem; font-weight: 700;">500+ Registered</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Animated Statistics Section -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-card reveal-on-scroll">
+          <div class="stat-number" data-target="25+">0</div>
+          <div class="stat-label">Upcoming Events</div>
+        </div>
+        <div class="stat-card reveal-on-scroll stagger-1">
+          <div class="stat-number" data-target="10+">0</div>
+          <div class="stat-label">Categories</div>
+        </div>
+        <div class="stat-card reveal-on-scroll stagger-2">
+          <div class="stat-number" data-target="500+">0</div>
+          <div class="stat-label">Participants</div>
+        </div>
+        <div class="stat-card reveal-on-scroll stagger-3">
+          <div class="stat-number" data-target="12">0</div>
+          <div class="stat-label">University Clubs</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dynamic Featured Upcoming Events Section -->
+  <section class="section" id="events">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="badge-tag">Curated Highlights</span>
+          <h2 class="section-title">Upcoming Campus Events</h2>
+          <p class="section-subtitle">Real-time schedule of workshops, hackathons, and symposiums happening this semester.</p>
+        </div>
+        <a href="events.html" class="btn btn-secondary">View All Events →</a>
+      </div>
+
+      <!-- Container where dynamic Supabase events will render -->
+      <div id="featured-events-grid" class="events-grid">
+        <!-- Render Skeleton Loading State Initially -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  <section class="section" id="categories" style="background: rgba(6, 10, 23, 0.4);">
+    <div class="container">
+      <div class="section-header" style="text-align: center; display: block; margin-bottom: 50px;">
+        <span class="badge-tag">Explore By Domain</span>
+        <h2 class="section-title">Diverse Campus Activities</h2>
+        <p class="section-subtitle" style="margin: 0 auto;">Whatever your passion, find student clubs and events tailored for you.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px;">
+        <a href="events.html?category=Technology" class="stat-card reveal-on-scroll" style="text-align: left; text-decoration: none;">
+          <div style="font-size: 2rem; margin-bottom: 12px;">💻</div>
+          <h3 style="font-size: 1.2rem; margin-bottom: 6px;">Technology</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Coding contests, robotics exhibits, and tech summits.</p>
+        </a>
+
+        <a href="events.html?category=Hackathon" class="stat-card reveal-on-scroll stagger-1" style="text-align: left; text-decoration: none;">
+          <div style="font-size: 2rem; margin-bottom: 12px;">⚡</div>
+          <h3 style="font-size: 1.2rem; margin-bottom: 6px;">Hackathons</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Sprints where students build working MVPs in 12-24 hours.</p>
+        </a>
+
+        <a href="events.html?category=Cultural" class="stat-card reveal-on-scroll stagger-2" style="text-align: left; text-decoration: none;">
+          <div style="font-size: 2rem; margin-bottom: 12px;">🎭</div>
+          <h3 style="font-size: 1.2rem; margin-bottom: 6px;">Cultural</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Music fests, dance evenings, theatrical performances.</p>
+        </a>
+
+        <a href="events.html?category=Seminar" class="stat-card reveal-on-scroll stagger-3" style="text-align: left; text-decoration: none;">
+          <div style="font-size: 2rem; margin-bottom: 12px;">🎙️</div>
+          <h3 style="font-size: 1.2rem; margin-bottom: 6px;">Seminars</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Industry guest talks, research papers, and career insights.</p>
+        </a>
+
+        <a href="events.html?category=Sports" class="stat-card reveal-on-scroll" style="text-align: left; text-decoration: none;">
+          <div style="font-size: 2rem; margin-bottom: 12px;">🏏</div>
+          <h3 style="font-size: 1.2rem; margin-bottom: 6px;">Sports</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Inter-college cricket, football leagues, and badminton clashes.</p>
+        </a>
+
+        <a href="events.html?category=Competition" class="stat-card reveal-on-scroll stagger-1" style="text-align: left; text-decoration: none;">
+          <div style="font-size: 2rem; margin-bottom: 12px;">🏆</div>
+          <h3 style="font-size: 1.2rem; margin-bottom: 6px;">Competitions</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Startup pitches, design hack sprints, and debate tourneys.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="section" id="about">
+    <div class="container">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
+        <div class="reveal-on-scroll">
+          <span class="badge-tag">Why Campus Connect</span>
+          <h2 class="section-title">Built for Modern Campus Life</h2>
+          <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 1.05rem;">
+            No more buried emails, missed registration deadlines, or scattered Google Forms. Campus Connect centralizes all official university event planning, registrations, and updates into one interactive hub.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; gap: 14px;">
+              <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(59, 130, 246, 0.15); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--primary); flex-shrink: 0;">1</div>
+              <div>
+                <h4 style="font-size: 1.05rem; margin-bottom: 4px;">One-Click Participation</h4>
+                <p style="font-size: 0.88rem; color: var(--text-muted);">Register with your university email. Manage your attendance and tickets from your personal dashboard.</p>
+              </div>
+            </div>
+            <div style="display: flex; gap: 14px;">
+              <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(139, 92, 246, 0.15); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--secondary); flex-shrink: 0;">2</div>
+              <div>
+                <h4 style="font-size: 1.05rem; margin-bottom: 4px;">Direct Administrative Publishing</h4>
+                <p style="font-size: 0.88rem; color: var(--text-muted);">Campus coordinators can adjust deadlines, update venues, and monitor attendee quotas with instantaneous live synchronization.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="reveal-on-scroll stagger-1">
+          <div class="stat-card" style="padding: 40px; text-align: left; position: relative;">
+            <h3 style="font-size: 1.4rem; margin-bottom: 16px;">Ready to participate?</h3>
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 24px;">Join thousands of fellow students discovering innovation, sports, and culture across our campus.</p>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <a href="signup.html" class="btn btn-primary">Join Campus Connect</a>
+              <a href="admin-login.html" class="btn btn-secondary">Admin Portal</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="nav-brand" style="margin-bottom: 12px;">
+            <div class="nav-brand-logo">🎓</div>
+            <span>Campus<span class="text-primary">Connect</span></span>
+          </div>
+          <p class="footer-desc">The modern university event discovery, registration, and administrative platform for collegiate excellence.</p>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="index.html" class="footer-link">Home</a></li>
+            <li><a href="events.html" class="footer-link">Browse Events</a></li>
+            <li><a href="#categories" class="footer-link">Categories</a></li>
+            <li><a href="#about" class="footer-link">About Platform</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Student Portal</h4>
+          <ul class="footer-links">
+            <li><a href="login.html" class="footer-link">Student Login</a></li>
+            <li><a href="signup.html" class="footer-link">Create Account</a></li>
+            <li><a href="my-events.html" class="footer-link">My Registered Events</a></li>
+            <li><a href="profile.html" class="footer-link">Student Profile</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Administration</h4>
+          <ul class="footer-links">
+            <li><a href="admin-login.html" class="footer-link">Admin Portal Login</a></li>
+            <li><a href="admin-dashboard.html" class="footer-link">Event Dashboard</a></li>
+            <li><a href="admin-add-event.html" class="footer-link">Create Event</a></li>
+            <li><a href="admin-participants.html" class="footer-link">Attendee Roster</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Campus Connect. Built for University BTech CSE Capstone. Powered by Supabase.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/supabase.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/events.js"></script>
+  
+  <script>
+    // Initialize Page & Load Featured Events Dynamically
+    document.addEventListener('DOMContentLoaded', async () => {
+      const grid = document.getElementById('featured-events-grid');
+      grid.innerHTML = eventsManager.renderSkeletonCards(3);
+
+      try {
+        const events = await eventsManager.getAllEvents();
+        // Take first 3 upcoming events for the landing page
+        const featured = events.slice(0, 3);
+
+        if (featured.length === 0) {
+          grid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+              <p class="text-muted">No upcoming events scheduled at this moment. Check back soon!</p>
+            </div>
+          `;
+          return;
+        }
+
+        let html = '';
+        for (const evt of featured) {
+          const regCount = await eventsManager.getEventRegistrationCount(evt.id);
+          html += eventsManager.renderEventCard(evt, regCount);
+        }
+        grid.innerHTML = html;
+        setupScrollReveal();
+      } catch (err) {
+        console.error('Error rendering featured events:', err);
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+            <p class="text-muted">Unable to load featured events right now.</p>
+          </div>
+        `;
+      }
+
+      // Animate Stats Numbers when scrolled into view
+      const statElements = document.querySelectorAll('.stat-number');
+      const statsObserver = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const target = entry.target.getAttribute('data-target');
+            animateCounter(entry.target, target);
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.3 });
+
+      statElements.forEach(el => statsObserver.observe(el));
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal Login | Campus Connect</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body style="background: #060a17;">
+
+  <!-- Minimal Header -->
+  <header class="navbar" style="background: rgba(6, 10, 23, 0.9);">
+    <div class="container navbar-inner">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-logo" style="background: linear-gradient(135deg, #7c3aed 0%, #2563eb 100%);">🛡️</div>
+        <span>Campus<span class="text-secondary">Admin</span></span>
+      </a>
+      <div class="nav-actions">
+        <a href="login.html" class="btn btn-ghost btn-sm">Student Login</a>
+        <a href="index.html" class="btn btn-secondary btn-sm">Back to Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="auth-page">
+    <div class="auth-card" style="border-color: rgba(139, 92, 246, 0.3); box-shadow: 0 20px 40px -15px rgba(124, 58, 237, 0.3);">
+      <div class="auth-header">
+        <div class="auth-logo" style="background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%);">
+          ⚡
+        </div>
+        <h1 class="auth-title">Campus Connect Admin</h1>
+        <p class="text-muted">Enter administrative credentials to manage campus events, quotas, and participant registries.</p>
+      </div>
+
+      <!-- Demo Admin Credentials Box -->
+      <div class="demo-credentials-box" style="background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.4);">
+        <div class="demo-credentials-header" style="color: #c084fc;">
+          <span>Admin Demo Credentials</span>
+          <button type="button" class="btn-fill-demo" id="btn-fill-admin" style="background: rgba(139, 92, 246, 0.25); border-color: rgba(139, 92, 246, 0.5);">Auto-Fill</button>
+        </div>
+        <div>Email: <strong>admin@campusconnect.edu</strong></div>
+        <div>Password: <strong>Admin@123</strong></div>
+      </div>
+
+      <form id="admin-login-form">
+        <div class="form-group">
+          <label class="form-label" for="admin-email">Administrator Email</label>
+          <input type="email" id="admin-email" class="form-input" placeholder="admin@campusconnect.edu" required autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="admin-password">Password</label>
+          <input type="password" id="admin-password" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+
+        <button type="submit" id="btn-admin-submit" class="btn btn-purple btn-block btn-lg" style="margin-top: 10px;">
+          <span class="btn-text">Login to Dashboard</span>
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 24px; font-size: 0.85rem; color: var(--text-dim);">
+        Restricted to verified faculty, department coordinators, and university administration.
+      </div>
+    </div>
+  </main>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const form = document.getElementById('admin-login-form');
+    const submitBtn = document.getElementById('btn-admin-submit');
+    const emailInput = document.getElementById('admin-email');
+    const passwordInput = document.getElementById('admin-password');
+
+    // 1-Click Demo Fill
+    document.getElementById('btn-fill-admin').addEventListener('click', () => {
+      emailInput.value = 'admin@campusconnect.edu';
+      passwordInput.value = 'Admin@123';
+      showToast('Demo admin credentials filled!', 'info', 2000);
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+        showToast('Please enter both administrator email and password.', 'warning');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner"></span> Verifying admin privileges...';
+
+      try {
+        const { user } = await authManager.loginAdmin(email, password);
+        showToast('Administrator verified. Welcome!', 'success');
+        setTimeout(() => {
+          window.location.href = 'admin-dashboard.html';
+        }, 800);
+      } catch (err) {
+        console.error('Admin login error:', err);
+        showToast(err.message || 'Unauthorized access: Invalid admin credentials.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span class="btn-text">Login to Dashboard</span>';
+      }
+    });
+  </script>
+</body>
+</html>

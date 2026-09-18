@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Login | Campus Connect</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Minimal Header -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-logo">🎓</div>
+        <span>Campus<span class="text-primary">Connect</span></span>
+      </a>
+      <div class="nav-actions">
+        <a href="signup.html" class="btn btn-secondary btn-sm">Create Account</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Login Main -->
+  <main class="auth-page">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo">🔑</div>
+        <h1 class="auth-title">Student Login</h1>
+        <p class="text-muted">Enter your university credentials to access your event passes and registrations.</p>
+      </div>
+
+      <!-- Quick Demo Credentials Box -->
+      <div class="demo-credentials-box">
+        <div class="demo-credentials-header">
+          <span>Student Demo Account</span>
+          <button type="button" class="btn-fill-demo" id="btn-fill-student">Auto-Fill</button>
+        </div>
+        <div>Email: <strong>student@university.edu</strong></div>
+        <div>Password: <strong>student123</strong></div>
+      </div>
+
+      <form id="student-login-form">
+        <div class="form-group">
+          <label class="form-label" for="email">University Email</label>
+          <input type="email" id="email" class="form-input" placeholder="e.g. rollnumber@university.edu" required autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input type="password" id="password" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+
+        <button type="submit" id="btn-submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 10px;">
+          <span class="btn-text">Sign In to Campus Connect</span>
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 24px; font-size: 0.9rem; color: var(--text-muted);">
+        Don't have an account? <a href="signup.html" style="color: var(--primary); font-weight: 600;">Sign Up here</a>
+      </div>
+
+      <div style="text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-subtle); font-size: 0.85rem;">
+        <a href="admin-login.html" style="color: var(--text-dim); transition: color var(--transition-fast);">
+          Administrator Access Portal →
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const form = document.getElementById('student-login-form');
+    const submitBtn = document.getElementById('btn-submit');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+
+    // 1-Click Demo Fill
+    document.getElementById('btn-fill-student').addEventListener('click', () => {
+      emailInput.value = 'student@university.edu';
+      passwordInput.value = 'student123';
+      showToast('Demo student credentials filled!', 'info', 2000);
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+        showToast('Please enter both email and password.', 'warning');
+        return;
+      }
+
+      // Loading state
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner"></span> Signing in...';
+
+      try {
+        const { user } = await authManager.loginStudent(email, password);
+        showToast(`Welcome back, ${user.user_metadata?.name || 'Student'}!`, 'success');
+
+        // Check redirect parameter in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get('redirect');
+
+        setTimeout(() => {
+          if (redirectUrl) {
+            window.location.href = decodeURIComponent(redirectUrl);
+          } else {
+            window.location.href = 'my-events.html';
+          }
+        }, 800);
+      } catch (err) {
+        console.error('Login error:', err);
+        showToast(err.message || 'Invalid credentials. Please verify your email and password.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span class="btn-text">Sign In to Campus Connect</span>';
+      }
+    });
+  </script>
+</body>
+</html>

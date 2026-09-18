@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Campus Events | Campus Connect</title>
+  <meta name="description" content="Search and filter workshops, hackathons, and cultural events happening across university grounds.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-logo">🎓</div>
+        <span>Campus<span class="text-primary">Connect</span></span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="events.html" class="nav-link active">Events</a></li>
+          <li><a href="index.html#categories" class="nav-link">Categories</a></li>
+          <li><a href="index.html#about" class="nav-link">About</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="login.html" class="btn btn-ghost btn-sm">Login</a>
+        <a href="signup.html" class="btn btn-primary btn-sm">Get Started</a>
+      </div>
+
+      <button class="nav-toggle" aria-label="Toggle navigation menu">☰</button>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 40px; padding-bottom: 80px;">
+    <!-- Page Header -->
+    <div class="section-header" style="margin-bottom: 28px;">
+      <div>
+        <span class="badge-tag">Directory</span>
+        <h1 class="section-title">Explore University Events</h1>
+        <p class="section-subtitle">Find upcoming hackathons, tech fests, cultural nights, and athletic tournaments.</p>
+      </div>
+      <div id="events-count-badge" class="badge-tag" style="background: rgba(255, 255, 255, 0.05); border-color: var(--border-light); color: var(--text-main);">
+        Loading events...
+      </div>
+    </div>
+
+    <!-- Search & Sort Controls -->
+    <div class="search-filter-bar">
+      <div class="search-input-wrap">
+        <span class="search-input-icon">🔍</span>
+        <input type="text" id="search-input" class="search-input" placeholder="Search events by title, organizer, or venue...">
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <label for="sort-select" style="font-size: 0.85rem; color: var(--text-muted); white-space: nowrap;">Sort by:</label>
+        <select id="sort-select" class="filter-select">
+          <option value="upcoming">Upcoming Date</option>
+          <option value="latest">Latest Added</option>
+          <option value="deadline">Registration Deadline</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Category Filter Chips -->
+    <div class="category-chips" id="category-chips">
+      <button class="category-chip active" data-category="All">All</button>
+      <button class="category-chip" data-category="Technology">Technology</button>
+      <button class="category-chip" data-category="Hackathon">Hackathon</button>
+      <button class="category-chip" data-category="Workshop">Workshop</button>
+      <button class="category-chip" data-category="Cultural">Cultural</button>
+      <button class="category-chip" data-category="Sports">Sports</button>
+      <button class="category-chip" data-category="Seminar">Seminar</button>
+      <button class="category-chip" data-category="Competition">Competition</button>
+      <button class="category-chip" data-category="Club Activity">Club Activity</button>
+    </div>
+
+    <!-- Events Container -->
+    <div id="events-grid" class="events-grid">
+      <!-- Skeletons rendered initially -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="border-top: none; padding-top: 0;">
+        <p>&copy; 2026 Campus Connect. All rights reserved. University Event Management System.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/events.js"></script>
+
+  <script>
+    let allEvents = [];
+    let selectedCategory = 'All';
+    let searchQuery = '';
+    let currentSort = 'upcoming';
+
+    const eventsGrid = document.getElementById('events-grid');
+    const searchInput = document.getElementById('search-input');
+    const sortSelect = document.getElementById('sort-select');
+    const countBadge = document.getElementById('events-count-badge');
+    const categoryChips = document.querySelectorAll('.category-chip');
+
+    // Parse URL query parameter for category pre-filtering
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoryFromUrl = urlParams.get('category');
+    if (categoryFromUrl) {
+      selectedCategory = categoryFromUrl;
+      categoryChips.forEach(chip => {
+        if (chip.getAttribute('data-category').toLowerCase() === categoryFromUrl.toLowerCase()) {
+          chip.classList.add('active');
+        } else {
+          chip.classList.remove('active');
+        }
+      });
+    }
+
+    async function loadEvents() {
+      eventsGrid.innerHTML = eventsManager.renderSkeletonCards(6);
+      try {
+        allEvents = await eventsManager.getAllEvents();
+        applyFiltersAndRender();
+      } catch (err) {
+        console.error('Error fetching events:', err);
+        eventsGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+            <p class="text-rose">Failed to load events from Supabase. Please check connection.</p>
+          </div>
+        `;
+      }
+    }
+
+    async function applyFiltersAndRender() {
+      let filtered = [...allEvents];
+
+      // 1. Filter by category
+      if (selectedCategory !== 'All') {
+        filtered = filtered.filter(e => e.category && e.category.toLowerCase() === selectedCategory.toLowerCase());
+      }
+
+      // 2. Search query filter
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        filtered = filtered.filter(e => 
+          (e.title && e.title.toLowerCase().includes(q)) ||
+          (e.organizer && e.organizer.toLowerCase().includes(q)) ||
+          (e.venue && e.venue.toLowerCase().includes(q)) ||
+          (e.description && e.description.toLowerCase().includes(q))
+        );
+      }
+
+      // 3. Sorting
+      if (currentSort === 'upcoming') {
+        filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+      } else if (currentSort === 'latest') {
+        filtered.sort((a, b) => new Date(b.created_at || b.date) - new Date(a.created_at || a.date));
+      } else if (currentSort === 'deadline') {
+        filtered.sort((a, b) => new Date(a.registration_deadline) - new Date(b.registration_deadline));
+      }
+
+      // Update count badge
+      countBadge.textContent = `${filtered.length} event${filtered.length === 1 ? '' : 's'} available`;
+
+      // Render items
+      if (filtered.length === 0) {
+        eventsGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 70px 20px; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-subtle);">
+            <div style="font-size: 2.5rem; margin-bottom: 12px;">🔍</div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 8px;">No matching events found</h3>
+            <p class="text-muted" style="margin-bottom: 20px; max-width: 400px; margin-left: auto; margin-right: auto;">
+              No campus events match your current search and filter criteria.
+            </p>
+            <button class="btn btn-secondary btn-sm" onclick="resetFilters()">Reset All Filters</button>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      for (const evt of filtered) {
+        const regCount = await eventsManager.getEventRegistrationCount(evt.id);
+        html += eventsManager.renderEventCard(evt, regCount);
+      }
+      eventsGrid.innerHTML = html;
+      setupScrollReveal();
+    }
+
+    function resetFilters() {
+      selectedCategory = 'All';
+      searchQuery = '';
+      searchInput.value = '';
+      categoryChips.forEach(c => {
+        c.classList.toggle('active', c.getAttribute('data-category') === 'All');
+      });
+      applyFiltersAndRender();
+    }
+
+    // Category chip click listeners
+    categoryChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        categoryChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        selectedCategory = chip.getAttribute('data-category');
+        applyFiltersAndRender();
+      });
+    });
+
+    // Search input listener (debounced)
+    let debounceTimer;
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        searchQuery = e.target.value;
+        applyFiltersAndRender();
+      }, 250);
+    });
+
+    // Sort select listener
+    sortSelect.addEventListener('change', (e) => {
+      currentSort = e.target.value;
+      applyFiltersAndRender();
+    });
+
+    document.addEventListener('DOMContentLoaded', loadEvents);
+  </script>
+</body>
+</html>
