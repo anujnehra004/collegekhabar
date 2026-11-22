@@ -1,8 +1,13 @@
 # dependencies
+node_modules/
 /node_modules
 /.pnp
 .pnp.js
 .yarn/cache
+
+# environment variables
+.env
+.env*.local
 
 # testing
 /coverage

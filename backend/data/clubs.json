@@ -1,0 +1,54 @@
+[
+  {
+    "id": "club-001",
+    "_id": "6724b1b2c3d4e5f6a7b8c911",
+    "name": "Coding Ninjas Club",
+    "category": "Technical",
+    "description": "Premier competitive programming and software development society fostering algorithmic problem solving.",
+    "leadName": "Aarav Sharma",
+    "leadEmail": "aarav.sharma@campus.edu",
+    "memberCount": 180,
+    "eventsCount": 12,
+    "logoUrl": "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=400&q=80",
+    "isActive": true
+  },
+  {
+    "id": "club-002",
+    "_id": "6724b1b2c3d4e5f6a7b8c912",
+    "name": "Web Enthusiasts Club",
+    "category": "Technical",
+    "description": "Hub for front-end, back-end, and UI/UX designers building scalable modern web applications.",
+    "leadName": "Priya Verma",
+    "leadEmail": "priya.verma@campus.edu",
+    "memberCount": 140,
+    "eventsCount": 8,
+    "logoUrl": "https://images.unsplash.com/photo-1547658719-da2b51169166?auto=format&fit=crop&w=400&q=80",
+    "isActive": true
+  },
+  {
+    "id": "club-003",
+    "_id": "6724b1b2c3d4e5f6a7b8c913",
+    "name": "Cultural Affairs Committee",
+    "category": "Cultural",
+    "description": "Orchestrates music, dance, theatre, and the grand annual university fest.",
+    "leadName": "Rohan Mehra",
+    "leadEmail": "rohan.mehra@campus.edu",
+    "memberCount": 220,
+    "eventsCount": 15,
+    "logoUrl": "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=400&q=80",
+    "isActive": true
+  },
+  {
+    "id": "club-004",
+    "_id": "6724b1b2c3d4e5f6a7b8c914",
+    "name": "IEEE Student Branch",
+    "category": "Technical",
+    "description": "Global student community organizing research seminars, robotics expos, and electronics workshops.",
+    "leadName": "Neha Gupta",
+    "leadEmail": "neha.gupta@campus.edu",
+    "memberCount": 95,
+    "eventsCount": 6,
+    "logoUrl": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80",
+    "isActive": true
+  }
+]

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusConnect | Interactive API Hub & Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #7C3AED;
+      --primary-hover: #6D28D9;
+      --primary-light: #EDE9FE;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --dark: #0F172A;
+      --slate: #334155;
+      --muted: #64748B;
+      --border: #E2E8F0;
+      --bg: #F8FAFC;
+      --card-bg: #FFFFFF;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--slate);
+      line-height: 1.5;
+    }
+
+    header {
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--border);
+      padding: 18px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--dark);
+      text-decoration: none;
+    }
+
+    .badge-hub {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 24px;
+    }
+
+    .hero-banner {
+      background: linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);
+      color: white;
+      padding: 32px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.25);
+    }
+    .hero-banner h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+    .hero-banner p { opacity: 0.9; max-width: 800px; font-size: 15px; }
+
+    .param-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .param-pill {
+      background: rgba(255, 255, 255, 0.18);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--dark);
+      margin: 32px 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .api-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 18px;
+    }
+
+    .api-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .api-card:hover {
+      box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+      border-color: #CBD5E1;
+    }
+
+    .api-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .method {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .method-get { background: #E0F2FE; color: #0284C7; }
+    .method-post { background: #DCFCE7; color: #16A34A; }
+    .method-put { background: #FEF3C7; color: #D97706; }
+    .method-delete { background: #FEE2E2; color: #DC2626; }
+
+    .endpoint {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .desc {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .btn-test {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 12.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+      transition: background 0.15s;
+    }
+    .btn-test:hover { background: var(--primary-hover); }
+
+    .console-section {
+      margin-top: 40px;
+      background: #0F172A;
+      color: #F8FAFC;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .console-header {
+      background: #1E293B;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .console-body {
+      padding: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="/" class="brand">
+      <span>🎓 CampusConnect</span>
+      <span class="badge-hub">API Hub</span>
+    </a>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <a href="/" style="font-size:13.5px;color:var(--slate);text-decoration:none;font-weight:600;">← Back to Main App</a>
+      <a href="/api/health" target="_blank" class="btn-test" style="background:#10B981;">Health Diagnostics</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="hero-banner">
+      <h1>⚡ Full Stack REST API Hub & Verification Console</h1>
+      <p>Interactive testing console covering all 4 core parameters: Live External Weather/Quotes APIs, Express Server Setup, Local JSON File Storage APIs, and MongoDB Mongoose CRUD Operations.</p>
+      
+      <div class="param-pills">
+        <span class="param-pill">✓ Parameter 1: Open-Meteo & Quotes APIs</span>
+        <span class="param-pill">✓ Parameter 2: Express 4 & CORS Server Setup</span>
+        <span class="param-pill">✓ Parameter 3: Local JSON File Storage (fs.promises)</span>
+        <span class="param-pill">✓ Parameter 4: MongoDB / Mongoose ODM CRUD</span>
+      </div>
+    </div>
+
+    <!-- Parameter 1: External APIs -->
+    <div class="section-title">
+      <span>🌐</span> Parameter 1: External APIs Integration
+    </div>
+    <div class="api-grid">
+      <div class="api-card">
+        <div>
+          <div class="api-header">
+            <span class="method method-get">GET</span>
+            <span class="endpoint">/api/external/weather</span>
+          </div>
+          <p class="desc">Live Open-Meteo weather forecast for campus coordinates and fest outdoor advisories.</p>
+        </div>
+        <button class="btn-test" onclick="testEndpoint('/api/external/weather')">Test Endpoint →</button>
+      </div>
+
+      <div class="api-card">
+        <div>
+          <div class="api-header">
+            <span class="method method-get">GET</span>
+            <span class="endpoint">/api/external/quote</span>
+          </div>
+          <p class="desc">Daily student motivational inspiration quote with author citation.</p>
+        </div>
+        <button class="btn-test" onclick="testEndpoint('/api/external/quote')">Test Endpoint →</button>
+      </div>
+
+      <div class="api-card">
+        <div>
+          <div class="api-header">
+            <span class="method method-get">GET</span>
+            <span class="endpoint">/api/external/holidays</span>
+          </div>
+          <p class="desc">Academic and national holiday calendar for semester planning.</p>
+        </div>
+        <button class="btn-test" onclick="testEndpoint('/api/external/holidays')">Test Endpoint →</button>
+      </div>
+    </div>
+
+    <!-- Parameter 3: Local JSON Storage APIs -->
+    <div class="section-title">
+      <span>📁</span> Parameter 3: Express APIs for Local JSON File Storage
+    </div>
+    <div class="api-grid">
+      <div class="api-card">
+        <div>
+          <div class="api-header">
+            <span class="method method-get">GET</span>
+            <span class="endpoint">/api/local/events</span>
+          </div>
+          <p class="desc">Fetches all campus events directly from backend/data/events.json.</p>
+        </div>
+        <button class="btn-test" onclick="testEndpoint('/api/local/events')">Test Endpoint →</button>
+      </div>
+
+      <div class="api-card">
+        <div>
+          <div class="api-header">
+            <span class="method method-get">GET</span>
+            <span class="endpoint">/api/local/registrations</span>
+          </div>
+          <p class="desc">Reads saved student registrations from backend/data/registrations.json.</p>
+        </div>
+        <button class="btn-test" onclick="testEndpoint('/api/local/registrations')">Test Endpoint →</button>
+      </div>
+
+      <div class="api-card">
+        <div>
+          <div class="api-header">
+            <span class="method method-get">GET</span>
+            <span class="endpoint">/api/local/clubs</span>
+          </div>
+          <p class="desc">Fetches active university clubs from backend/data/clubs.json.</p>
+        </div>
+        <button class="btn-test" onclick="testEndpoint('/api/local/clubs')">Test Endpoint →</button>
+      </div>
+    </div>
+
+    <!-- Parameter 4: MongoDB CRUD Operations -->
+    <div class="section-title">
+      <span>🍃</span> Parameter 4: MongoDB / Mongoose CRUD Operations
+    </div>
+    <div class="api-grid">
+      <div class="api-card">
+        <div>
+          <div class="api-header">
+            <span class="method method-get">GET</span>
+            <span class="endpoint">/api/events</span>
+          </div>
+          <p class="desc">MongoDB Event collection query with sorting, category filters, and search.</p>
+        </div>
+        <button class="btn-test" onclick="testEndpoint('/api/events')">Test Endpoint →</button>
+      </div>
+
+      <div class="api-card">
+        <div>
+          <div class="api-header">
+            <span class="method method-post">POST</span>
+            <span class="endpoint">/api/registrations</span>
+          </div>
+          <p class="desc">Creates student registration, generates custom ID (CC-2026-XXXX), and decrements event seats.</p>
+        </div>
+        <button class="btn-test" onclick="testPostRegistration()">Create Sample Registration →</button>
+      </div>
+
+      <div class="api-card">
+        <div>
+          <div class="api-header">
+            <span class="method method-get">GET</span>
+            <span class="endpoint">/api/clubs</span>
+          </div>
+          <p class="desc">Fetches all student clubs with leader contact info and member counts.</p>
+        </div>
+        <button class="btn-test" onclick="testEndpoint('/api/clubs')">Test Endpoint →</button>
+      </div>
+    </div>
+
+    <!-- Live Response Console -->
+    <div class="console-section">
+      <div class="console-header">
+        <span id="console-status">📡 Live Output Console (Click any "Test Endpoint" button above)</span>
+        <span id="response-time" style="color: #94A3B8;">0ms</span>
+      </div>
+      <pre id="console-body" class="console-body">// Ready. Click any endpoint button above to inspect live API output.</pre>
+    </div>
+  </div>
+
+  <script>
+    async function testEndpoint(endpoint) {
+      const consoleStatus = document.getElementById('console-status');
+      const responseTime = document.getElementById('response-time');
+      const consoleBody = document.getElementById('console-body');
+
+      consoleStatus.textContent = `⏳ Requesting ${endpoint}...`;
+      consoleBody.textContent = 'Loading...';
+      const start = Date.now();
+
+      try {
+        const res = await fetch(endpoint);
+        const duration = Date.now() - start;
+        const json = await res.json();
+
+        consoleStatus.textContent = `HTTP ${res.status} ${res.statusText} - ${endpoint}`;
+        responseTime.textContent = `${duration}ms`;
+        consoleBody.textContent = JSON.stringify(json, null, 2);
+      } catch (err) {
+        consoleStatus.textContent = `❌ Error testing ${endpoint}`;
+        consoleBody.textContent = err.message;
+      }
+    }
+
+    async function testPostRegistration() {
+      const payload = {
+        eventTitle: 'TechFest 2026: Code & Innovate',
+        fullName: 'Chaitanya Aggarwal',
+        rollNumber: '23CSE1042',
+        email: 'chaitanya.aggarwal@campus.edu',
+        phone: '+91 98765 43210',
+        department: 'CSE',
+        yearOfStudy: '3rd Year',
+        tShirtSize: 'L',
+        teamName: 'ByteBusters'
+      };
+
+      const consoleStatus = document.getElementById('console-status');
+      const responseTime = document.getElementById('response-time');
+      const consoleBody = document.getElementById('console-body');
+
+      consoleStatus.textContent = '⏳ Submitting sample registration...';
+      const start = Date.now();
+
+      try {
+        const res = await fetch('/api/registrations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const duration = Date.now() - start;
+        const json = await res.json();
+
+        consoleStatus.textContent = `HTTP ${res.status} ${res.statusText} - POST /api/registrations`;
+        responseTime.textContent = `${duration}ms`;
+        consoleBody.textContent = JSON.stringify(json, null, 2);
+      } catch (err) {
+        consoleStatus.textContent = '❌ Error submitting registration';
+        consoleBody.textContent = err.message;
+      }
+    }
+  </script>
+</body>
+</html>

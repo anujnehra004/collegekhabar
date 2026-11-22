@@ -1,0 +1,38 @@
+[
+  {
+    "id": "reg-001",
+    "_id": "6724c1b2c3d4e5f6a7b8c921",
+    "registrationId": "CC-2026-0847",
+    "eventTitle": "TechFest 2026: Code & Innovate",
+    "eventId": "6724a1b2c3d4e5f6a7b8c901",
+    "fullName": "Chaitanya Aggarwal",
+    "rollNumber": "23CSE1042",
+    "email": "chaitanya.aggarwal@campus.edu",
+    "phone": "+91 98765 43210",
+    "department": "CSE",
+    "yearOfStudy": "3rd Year",
+    "tShirtSize": "L",
+    "teamName": "ByteBusters",
+    "dietaryPreference": "Vegetarian",
+    "status": "Confirmed",
+    "registeredAt": "2026-11-20T10:15:30.000Z"
+  },
+  {
+    "id": "reg-002",
+    "_id": "6724c1b2c3d4e5f6a7b8c922",
+    "registrationId": "CC-2026-0848",
+    "eventTitle": "Full Stack Web Development Workshop",
+    "eventId": "6724a1b2c3d4e5f6a7b8c902",
+    "fullName": "Sneha Roy",
+    "rollNumber": "23IT1018",
+    "email": "sneha.roy@campus.edu",
+    "phone": "+91 98111 22334",
+    "department": "IT",
+    "yearOfStudy": "2nd Year",
+    "tShirtSize": "M",
+    "teamName": "",
+    "dietaryPreference": "Vegetarian",
+    "status": "Confirmed",
+    "registeredAt": "2026-11-21T14:22:10.000Z"
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "id": "evt-001",
+    "_id": "6724a1b2c3d4e5f6a7b8c901",
+    "title": "TechFest 2026: Code & Innovate",
+    "slug": "techfest-2026-code-innovate",
+    "description": "Annual 36-hour inter-college hackathon focusing on AI, Web3, and Sustainable Tech. Cash prizes worth ₹1,50,000.",
+    "category": "Hackathon",
+    "date": "2026-11-28",
+    "time": "09:00 AM",
+    "venue": "APJ Abdul Kalam Auditorium & Labs",
+    "club": "Coding Ninjas Club",
+    "organizer": "Department of Computer Science",
+    "totalSeats": 200,
+    "registeredSeats": 142,
+    "fee": 0,
+    "bannerUrl": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80",
+    "tags": [
+      "Coding",
+      "Hackathon",
+      "AI",
+      "CashPrize"
+    ],
+    "status": "Upcoming"
+  },
+  {
+    "id": "evt-002",
+    "_id": "6724a1b2c3d4e5f6a7b8c902",
+    "title": "Full Stack Web Development Workshop",
+    "slug": "full-stack-web-development-workshop",
+    "description": "Hands-on bootcamp on Node.js, Express, and MongoDB. Learn RESTful architecture, JWT authentication, and cloud deployment.",
+    "category": "Workshop",
+    "date": "2026-12-02",
+    "time": "02:00 PM",
+    "venue": "Seminar Hall B, Block 3",
+    "club": "Web Enthusiasts Club",
+    "organizer": "GDG Campus chapter",
+    "totalSeats": 80,
+    "registeredSeats": 65,
+    "fee": 100,
+    "bannerUrl": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80",
+    "tags": [
+      "NodeJS",
+      "WebDev",
+      "Express",
+      "MongoDB"
+    ],
+    "status": "Upcoming"
+  },
+  {
+    "id": "evt-003",
+    "_id": "6724a1b2c3d4e5f6a7b8c903",
+    "title": "Echoes: Annual Cultural Fest",
+    "slug": "echoes-annual-cultural-fest",
+    "description": "Grand campus celebration with battle of bands, classical dance showdown, drama society plays, and celebrity night.",
+    "category": "Cultural",
+    "date": "2026-12-15",
+    "time": "05:00 PM",
+    "venue": "Main University Amphitheatre",
+    "club": "Cultural Affairs Committee",
+    "organizer": "Student Council",
+    "totalSeats": 1000,
+    "registeredSeats": 780,
+    "fee": 0,
+    "bannerUrl": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=800&q=80",
+    "tags": [
+      "Fest",
+      "Music",
+      "Dance",
+      "Celebration"
+    ],
+    "status": "Upcoming"
+  },
+  {
+    "id": "evt-004",
+    "_id": "6724a1b2c3d4e5f6a7b8c904",
+    "title": "AI in Healthcare: Future Perspectives",
+    "slug": "ai-in-healthcare-future-perspectives",
+    "description": "Distinguished lecture series featuring leading biomedical researchers and industry experts on diagnostic ML models.",
+    "category": "Seminar",
+    "date": "2026-12-08",
+    "time": "11:00 AM",
+    "venue": "Conference Hall 1",
+    "club": "IEEE Student Branch",
+    "organizer": "R&D Cell",
+    "totalSeats": 120,
+    "registeredSeats": 94,
+    "fee": 0,
+    "bannerUrl": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80",
+    "tags": [
+      "AI",
+      "Healthcare",
+      "Research",
+      "Seminar"
+    ],
+    "status": "Upcoming"
+  }
+]
