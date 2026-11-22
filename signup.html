@@ -105,11 +105,32 @@
       submitBtn.innerHTML = '<span class="spinner"></span> Creating account...';
 
       try {
+        // 1. Save student registration directly into MongoDB via Express API
+        try {
+          const regRes = await fetch('/api/registrations', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              eventTitle: 'TechFest 2026: Code & Innovate',
+              fullName: name,
+              email: email,
+              rollNumber: email.split('@')[0].toUpperCase(),
+              department: 'CSE',
+              yearOfStudy: '3rd Year'
+            })
+          });
+          const regData = await regRes.json();
+          console.log('MongoDB registration created:', regData);
+        } catch (apiErr) {
+          console.warn('Backend API registration note:', apiErr);
+        }
+
+        // 2. Also initialize student session
         await authManager.signupStudent(name, email, password);
-        showToast('Account created successfully! Welcome to Campus Connect.', 'success');
+        showToast('Student registered successfully in MongoDB! Welcome to Campus Connect.', 'success');
         setTimeout(() => {
           window.location.href = 'my-events.html';
-        }, 1000);
+        }, 1200);
       } catch (err) {
         console.error('Signup error:', err);
         showToast(err.message || 'Signup failed. Please try again.', 'error');

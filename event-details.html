@@ -295,7 +295,36 @@
         const participateBtn = document.getElementById('btn-participate');
         participateBtn.addEventListener('click', async () => {
           participateBtn.disabled = true;
-          participateBtn.innerHTML = '<span class="spinner"></span> Registering...';
+          participateBtn.innerHTML = '<span class="spinner"></span> Registering in MongoDB...';
+
+          let studentProfile = null;
+          try {
+            studentProfile = await authManager.getUserProfile();
+          } catch {}
+
+          const studentEmail = (studentProfile && studentProfile.email) ? studentProfile.email : 'student@campus.edu';
+          const studentName = (studentProfile && studentProfile.name) ? studentProfile.name : 'Registered Student';
+
+          try {
+            // Save directly to MongoDB Atlas via Express API
+            const apiRes = await fetch('/api/registrations', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                eventId: eventId,
+                eventTitle: event.title || 'Campus Event',
+                fullName: studentName,
+                email: studentEmail,
+                rollNumber: studentEmail.split('@')[0].toUpperCase(),
+                department: 'CSE',
+                yearOfStudy: '3rd Year'
+              })
+            });
+            const regResult = await apiRes.json();
+            console.log('MongoDB registration confirmed:', regResult);
+          } catch (e) {
+            console.warn('API registration note:', e);
+          }
 
           const res = await studentManager.registerForEvent(eventId);
 

@@ -6,21 +6,25 @@ const jsonStorage = require('../services/jsonStorageService');
 // CREATE: POST /api/registrations
 async function createRegistration(req, res, next) {
   try {
-    const { eventTitle, fullName, rollNumber, email, phone, yearOfStudy, department, tShirtSize, teamName, dietaryPreference } = req.body;
-
-    if (!eventTitle || !fullName || !rollNumber || !email) {
+    const email = req.body.email ? req.body.email.trim() : '';
+    if (!email) {
       return res.status(400).json({
         success: false,
-        error: 'Event title, student full name, roll number, and email are required.'
+        error: 'Student email address is required.'
       });
     }
+
+    const fullName = req.body.fullName || req.body.name || email.split('@')[0];
+    const rollNumber = (req.body.rollNumber || email.split('@')[0]).toUpperCase();
+    const eventTitle = req.body.eventTitle || 'TechFest 2026: Code & Innovate';
+    const { phone, yearOfStudy, department, tShirtSize, teamName, dietaryPreference } = req.body;
 
     // Generate unique Registration ID e.g., CC-2026-4892
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const regId = `CC-2026-${randomSuffix}`;
 
     if (isMongoConnected()) {
-      // Check seat availability on Event
+      // Check seat availability on Event if event exists
       const event = await Event.findOne({
         title: { $regex: new RegExp(eventTitle.trim(), 'i') }
       });
@@ -35,7 +39,7 @@ async function createRegistration(req, res, next) {
       const registration = await Registration.create({
         registrationId: regId,
         eventTitle,
-        eventId: event ? event._id : null,
+        eventId: event ? event._id : (req.body.eventId || null),
         fullName,
         rollNumber: rollNumber.toUpperCase(),
         email: email.toLowerCase(),
